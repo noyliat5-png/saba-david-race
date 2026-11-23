@@ -1,0 +1,618 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body><title>המירוץ של סבא דוד</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&family=Secular+One&display=swap">
+<style>
+/* Layout: one-column phone app. Navy sticky bar, then cards that mirror the printed ones: red = task, gold = clue. */
+:root{
+  --bg:#eef0f7;          /* cool lavender-grey haze */
+  --surface:#ffffff;
+  --ink:#16213f;         /* deep navy */
+  --muted:#5b6380;
+  --line:#d5d9e8;
+  --task:#2b44a8;        /* task cards: indigo */
+  --task-soft:#e3e8fa;
+  --clue:#6c3fb0;        /* clue cards: violet */
+  --clue-soft:#efe6fb;
+  --accent:#3a7bd5;      /* sky blue: focus, highlights */
+  --good:#2b5fc4; --good-soft:#e1eafb;   /* money in: blue */
+  --bad:#5d4a8a;  --bad-soft:#ece8f5;    /* money out: muted violet */
+  --bar:#16213f; --bar-ink:#ffffff;
+  --plate:#ffffff;
+  --t0:#1f5fd1; --t1:#7a3fc4; --t2:#0e86b5; --t3:#3d4660;
+  --display:"Secular One","IBM Plex Sans Hebrew",Arial,sans-serif;
+  --body:"IBM Plex Sans Hebrew",Arial,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1424; --surface:#182035; --ink:#e8ebf5; --muted:#a0a8c2; --line:#2c3652;
+  --task:#8fa3f5; --task-soft:#232c55; --clue:#b99af0; --clue-soft:#2e2350; --accent:#7fb0f2;
+  --good:#8fb6f5; --good-soft:#1d2a4c; --bad:#b9addb; --bad-soft:#2a2540;
+  --bar:#0a0e1a; --bar-ink:#ffffff; --plate:#f4f5fa;
+  --t0:#7ea6f2; --t1:#b48ce8; --t2:#62bde0; --t3:#aab2c8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1424; --surface:#182035; --ink:#e8ebf5; --muted:#a0a8c2; --line:#2c3652;
+  --task:#8fa3f5; --task-soft:#232c55; --clue:#b99af0; --clue-soft:#2e2350; --accent:#7fb0f2;
+  --good:#8fb6f5; --good-soft:#1d2a4c; --bad:#b9addb; --bad-soft:#2a2540;
+  --bar:#0a0e1a; --bar-ink:#ffffff; --plate:#f4f5fa;
+  --t0:#7ea6f2; --t1:#b48ce8; --t2:#62bde0; --t3:#aab2c8; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:17px;line-height:1.6;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bar)}
+.wrap{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.9rem} h2{font-size:1.4rem} h3{font-size:1.12rem}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bar);color:var(--bar-ink);
+  margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));
+  padding:10px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bar .who{display:flex;align-items:center;gap:10px;min-width:0}
+.bar .dot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.7)}
+.bar .name{font-family:var(--display);font-size:1.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barbtn{background:transparent;border:1px solid rgba(255,255,255,.4);color:var(--bar-ink);border-radius:8px;padding:5px 12px;font-size:.88rem;min-height:36px}
+
+.hero{display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:18px;text-align:center}
+.plate{background:var(--plate);border-radius:16px;padding:10px 14px;display:inline-flex}
+.plate img{width:190px;height:auto;display:block}
+.eyebrow{font-size:.8rem;letter-spacing:.06em;color:var(--muted);font-weight:600}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.btn{border:0;border-radius:10px;padding:12px 16px;font-weight:600;background:var(--ink);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;text-decoration:none;text-align:center}
+.btn.alt{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px dashed var(--line);font-weight:500}
+.btn.good{background:var(--good);color:var(--surface)}
+.btn.bad{background:var(--bad);color:var(--surface)}
+.btn[disabled]{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>.btn{flex:1 1 130px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:500}
+input[type=text],input[type=number],input[inputmode],textarea,select{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;min-height:48px;width:100%}
+textarea{min-height:110px;font-family:var(--mono);font-size:.8rem;direction:ltr;text-align:left}
+
+/* race cards, echoing the printed ones */
+.rc{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.rc .head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;color:#fff}
+.rc.task .head{background:var(--task)} .rc.clue .head{background:var(--clue)} .rc.finish .head{background:var(--ink);color:var(--bg)}
+:root[data-theme="dark"] .rc .head{color:#0f1424}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rc .head{color:#0f1424}}
+.rc .kind{font-family:var(--display);font-size:1.15rem}
+.rc .sub{font-size:.82rem;opacity:.92}
+.rc .body{padding:16px;display:flex;flex-direction:column;gap:10px}
+.rc .body p.open{font-weight:600}
+.rc .foot{border-top:1px dashed var(--line);padding:8px 16px;font-size:.78rem;color:var(--muted);text-align:center}
+.rc .foot b{color:var(--clue)}
+.poem{display:grid;gap:12px;background:var(--bg);border-radius:10px;padding:12px 14px}
+.poem .st b{font-family:var(--display);font-weight:400;display:block;margin-bottom:2px}
+.poem .miss{background:var(--clue-soft);border-radius:4px;padding:0 4px;font-weight:600}
+.poem .note{color:var(--clue);font-size:.86rem;font-weight:600;margin-inline-start:6px}
+.qr{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.qr img{width:96px;height:96px;background:#fff;border-radius:8px;padding:4px;flex:none}
+.qr .t{flex:1 1 160px;min-width:0;display:flex;flex-direction:column;gap:8px}
+
+details.fold{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+details.fold>summary{list-style:none;padding:14px 16px;font-family:var(--display);font-size:1.12rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"+";font-family:var(--mono);color:var(--muted)}
+details.fold[open]>summary::after{content:"−"}
+details.fold>.in{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.rules{width:100%;border-collapse:collapse;font-size:.93rem}
+.rules td{border-top:1px solid var(--line);padding:8px 4px;vertical-align:top}
+.rules td:last-child{white-space:nowrap;font-weight:600;padding-inline-start:10px}
+.tablewrap{overflow-x:auto}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:20;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.warn{background:var(--task-soft);border:1px solid var(--task);border-radius:12px;padding:10px 14px;font-size:.9rem}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.shake{animation:shake .25s 2}
+@media (prefers-reduced-motion: reduce){.shake{animation:none}}
+.mark{display:flex;flex-direction:column;align-items:center;gap:2px}
+.mark .eighty{font-family:var(--display);font-size:3.4rem;line-height:1;color:var(--task);letter-spacing:.02em}
+.mark .eighty span{color:var(--clue)}
+.mark .tribe{font-family:var(--display);font-size:.95rem;color:var(--muted);direction:ltr}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;opacity:.85}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.live.off i{background:transparent;border:1.5px solid currentColor}
+
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pick button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);text-align:start;min-height:84px}
+.pick button .sw{width:26px;height:26px;border-radius:50%}
+.pick button b{font-family:var(--display);font-weight:400;font-size:1.2rem}
+.pick button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset}
+.lock{border:2px dashed var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--surface)}
+.lock .lk{display:flex;align-items:center;gap:10px}
+.lock .lk .tag{font-family:var(--display);font-size:1.15rem}
+.lock .lk .pill{font-size:.78rem;padding:2px 10px;border-radius:999px;font-weight:600}
+.lock.task .pill{background:var(--task-soft);color:var(--task)} .lock.clue .pill{background:var(--clue-soft);color:var(--clue)} .lock.finish .pill{background:var(--bg);color:var(--ink)}
+.codein{display:flex;gap:8px}
+.codein input{font-family:var(--mono);font-size:1.5rem;letter-spacing:.3em;text-align:center;direction:ltr;flex:1;min-width:0}
+.codein .btn{flex:none}
+.err{color:var(--bad);font-weight:600;font-size:.92rem}
+.ahead{display:flex;flex-wrap:wrap;gap:6px}
+.ahead span{font-size:.82rem;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.sect{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:6px}
+.confirm{display:flex;flex-direction:column;gap:10px}
+
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:4}
+.tabs button{border:0;background:transparent;border-radius:9px;padding:8px 2px;font-size:.88rem;font-weight:600;color:var(--muted);min-height:42px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1 1 0;min-width:52px;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 6px;font-weight:600;min-height:44px}
+.seg button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tm{position:relative;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 12px 10px;text-align:start;display:flex;flex-direction:column;gap:2px;overflow:hidden;min-width:0}
+.tm::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--c)}
+.tm .nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm .bal{font-family:var(--mono);font-size:1.45rem;font-weight:600;font-variant-numeric:tabular-nums}
+.tm[aria-pressed="true"]{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset}
+.grp{display:flex;flex-direction:column;gap:8px}
+.grp h3 .muted{font-family:var(--body);font-size:.85rem}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.act{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:10px;text-align:start;display:flex;flex-direction:column;gap:2px;min-height:62px}
+.act .amt{font-family:var(--mono);font-weight:600;font-size:1.05rem}
+.act.plus .amt{color:var(--good)} .act.minus .amt{color:var(--bad)}
+.act .lb{font-size:.86rem;line-height:1.35}
+.act:active{transform:scale(.98)}
+.counter{border:1.5px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.counter .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.counter .ctl{display:flex;align-items:center;gap:8px}
+.counter .ctl button.sq{width:48px;height:48px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);font-size:1.4rem;font-weight:600}
+.counter .ctl .n{font-family:var(--mono);font-size:1.6rem;font-weight:600;min-width:2.2ch;text-align:center}
+.counter .ctl .btn{flex:1}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.log li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.log .dot{width:10px;height:10px;border-radius:50%}
+.log .what{min-width:0;font-size:.92rem;line-height:1.35}
+.log .what small{display:block;color:var(--muted);font-size:.78rem}
+.log .amt{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.log .amt.plus{color:var(--good)} .log .amt.minus{color:var(--bad)}
+.undo{border:1px solid var(--line);background:transparent;border-radius:8px;padding:2px 8px;font-size:.78rem;color:var(--muted);margin-top:4px}
+.undo.armed{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.hostnote{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:.95rem}
+.hostnote b{font-weight:700}
+.answer{background:var(--good-soft);border-radius:12px;padding:12px 14px;font-weight:600}
+.hint{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.hint .c{font-family:var(--mono);font-weight:600;color:var(--clue)}
+.codecard{display:flex;flex-direction:column;gap:10px;border-top:5px solid var(--c)}
+.codecard .big{font-family:var(--mono);font-size:3rem;font-weight:600;letter-spacing:.18em;text-align:center;direction:ltr;line-height:1.1;padding:6px 0}
+.codecard .meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.9rem}
+.codes{border-collapse:collapse;font-size:.85rem;width:100%}
+.codes th,.codes td{border-top:1px solid var(--line);padding:6px 6px;text-align:center;white-space:nowrap}
+.codes td.mono{font-size:.95rem}
+.codes td.done{color:var(--muted);text-decoration:line-through}
+.board{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.board li{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;border-inline-start:8px solid var(--c)}
+.board .rk{font-family:var(--display);font-size:1.6rem;text-align:center}
+.board .nm{font-family:var(--display);font-size:1.25rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .bal{font-family:var(--mono);font-size:1.6rem;font-weight:600}
+.board li.first{background:var(--clue-soft)}
+.secthead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+
+.mybal{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+.mybal b{font-family:var(--mono);font-size:1.3rem;font-weight:600}
+.mini{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mini li{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;border-inline-start:6px solid var(--c);min-width:0}
+.mini li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.mini li b{font-family:var(--mono)}
+.mini li.me{box-shadow:0 0 0 2px var(--c) inset}
+.hostbody.locked .act,.hostbody.locked .counter,.hostbody.locked #custom,.hostbody.locked [data-give],.hostbody.locked [data-back],.hostbody.locked [data-undo],.hostbody.locked #reset,.hostbody.locked [data-name]{opacity:.45;pointer-events:none}
+.statusline{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;font-size:.86rem;color:var(--muted)}
+</style>
+
+<div id="app" class="wrap" aria-live="polite"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const DATA = {"qr": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAbwAAAG8AQMAAACffoKcAAAWfmNhQlgAABZ+anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAAFlhqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjFjMmFmNDMwLWVlODktNGJjNi1hMDY0LTdmNjUxNjEyM2MxOAAAAAOTanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAAuGp1bWIAAABEanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5pbmdyZWRpZW50LnYzAAAAABhjMnNo8Tz4DyZaIVdJatCuv9ywhgAAAGxjYm9yo2lkYzpmb3JtYXRpaW1hZ2UvcG5namluc3RhbmNlSUR4LHhtcDppaWQ6OTI3MjI4YmMtYTRlMS00MmFhLTlhZDAtNTUxMDYzMzc5NjE5bHJlbGF0aW9uc2hpcGhwYXJlbnRPZgAAAeJqdW1iAAAAQWp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuYWN0aW9ucy52MgAAAAAYYzJzaLKboTYvyHWwNtJRf7NLQ08AAAGZY2JvcqJnYWN0aW9uc4KiZmFjdGlvbmtjMnBhLm9wZW5lZGpwYXJhbWV0ZXJzoWtpbmdyZWRpZW50c4GiY3VybHgtc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5pbmdyZWRpZW50LnYzZGhhc2hYIGS/KAFfDf5XCY1yyOaWWbB2/E5SgGXFl/xkohZIdOunpGZhY3Rpb254HWNvbS5hbnRocm9waWMuY2xhdWRlLnByb3ZpZGVkanBhcmFtZXRlcnOheB9jb20uYW50aHJvcGljLm9yaWdpbi1jb25maWRlbmNlZ3Vua25vd25rZGVzY3JpcHRpb254ZkNsYXVkZSBwcm92aWRlZCB0aGlzIGZpbGUgYXQgdGhlIHJlcXVlc3Qgb2YgYSB1c2VyIGFuZCBtYXkgaGF2ZSBjcmVhdGVkIG9yIG1vZGlmaWVkIHRoZSBmaWxlIGNvbnRlbnRzLm1zb2Z0d2FyZUFnZW50oWRuYW1lZkNsYXVkZXJhbGxBY3Rpb25zSW5jbHVkZWT1AAAAyGp1bWIAAABAanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5oYXNoLmRhdGEAAAAAGGMyc2gTPNP3wgWyMKplqu+iEdnIAAAAgGNib3KlY2FsZ2ZzaGEyNTZjcGFkTQAAAAAAAAAAAAAAAABkaGFzaFgggLdRZAWAU0vuhlbOCOLD/jtoBHv9vz5Q4ciEnt35NmpkbmFtZW5qdW1iZiBtYW5pZmVzdGpleGNsdXNpb25zgaJlc3RhcnQYIWZsZW5ndGgZFooAAAI+anVtYgAAACdqdW1kYzJjbAARABCAAACqADibcQNjMnBhLmNsYWltLnYyAAAAAg9jYm9ypWNhbGdmc2hhMjU2aXNpZ25hdHVyZXhNc2VsZiNqdW1iZj0vYzJwYS91cm46YzJwYToxYzJhZjQzMC1lZTg5LTRiYzYtYTA2NC03ZjY1MTYxMjNjMTgvYzJwYS5zaWduYXR1cmVqaW5zdGFuY2VJRHgseG1wOmlpZDowMDBkZGZlYy1lODhlLTQ5NzctYTBlMS02MzJlZTI2NDdjYTFyY3JlYXRlZF9hc3NlcnRpb25zg6JjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggZL8oAV8N/lcJjXLI5pZZsHb8TlKAZcWX/GSiFkh066eiY3VybHgqc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5hY3Rpb25zLnYyZGhhc2hYIMLf+IbiI6Mdv0EIKvCwd3uh6Ewi7j18BfB9BCrjdiwComN1cmx4KXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaGFzaC5kYXRhZGhhc2hYIBWfiDAX+nZOOZi0Z4xP1VGETjCLdzU0TS6kz6E5b6yfdGNsYWltX2dlbmVyYXRvcl9pbmZvo2RuYW1lb0FudGhyb3BpYyBGaWxlc2d2ZXJzaW9uZTEuMC4wa3NwZWNWZXJzaW9uZTIuNC4wAAAQOGp1bWIAAAAoanVtZGMyY3MAEQAQgAAAqgA4m3EDYzJwYS5zaWduYXR1cmUAAAAQCGNib3LShFkCEqIBJhghWQIKMIICBjCCAY2gAwIBAgIUQOWgCu7COdC+uIP6BkIFPWdVEwAwCgYIKoZIzj0EAwMwSTEXMBUGA1UEChMOQW50aHJvcGljLCBQQkMxLjAsBgNVBAMTJUFudGhyb3BpYyBDb250ZW50IENyZWRlbnRpYWxzIFJvb3QgQ0EwHhcNMjYwODA3MTg0MzU2WhcNMjgwODA2MTk0MzU2WjBEMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEpMCcGA1UEAxMgQW50aHJvcGljIENsYXVkZSBDb250ZW50IFNpZ25pbmcwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASYegpry1AYBRTVNL1CpTlbROnY3dey+UrsF9C3phYrATN3ZHf93Mo8RQN0KOUuOn19P4oWNFWe5n2/She9N7eTo1gwVjAOBgNVHQ8BAf8EBAMCB4AwFQYDVR0lBA4wDAYKKwYBBAGD6F4CATAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFM5R4gSBTmRbI/jjxM+aPpzB11zCMAoGCCqGSM49BAMDA2cAMGQCMDFzHRSeAXrSy1WOzkbhPZ6Km2wGTmZ/2gK18k8BQGXyqz88Rdrz6CTX9flAnYNVxgIwcF9c3fVhqmJKpi+UhasNUMko69cyX6STPfta3Q8EjyzDjzoyrol46FP6VFHhvUcJoWNwYWRZDZ4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2WECYcWoRwZ9YUjiq/KioaRdDzMWHw0kuTxb3yJW8ip9yHtwB0vtwQ/6tbOQRY+nYvmy3jTFk4+VbPohNYs+adRcks4SFhQAAAAZQTFRFERER////2HbAKwAAAg9JREFUeNrtnEtuwzAMRIleQPe/pW6gwokkfpx0YRQYLZ5gBEbrtwkGzAxFy8az1Q0QEBAQ8Btoe7Xr/vpj9/t5kx8b/cceLkDAh+sSYZvKfcvSxdnmNRUbHkOrgCqtTokuWe61quj9Mb5VQLFWvYqa19L9L7QKeFBdHSMZg27JD6BVwGP8aiyqM2TFkotfBdRqNfYB/rjoAwCqtRpXqbE7asXA9fIGfKuAMr/q1nQJuDYBonrRKqDKA2RNevy3tBfgjVa0CijxAH1+FoO6t8OirSVbAeq1Grauth/YMp6f7wu/CqjzAN6qyoHLI9XqX+FXAfXZKrZY/bfeto/dgy7UVUClByhhPwSu2l9t9KwA1VrtH7xrEi1aBTzEAyw7mn7xW51uRauA+my1pqxjjPId2Dbi9DVaBVR5gNJWjakqBi5PYWgVUOQBfN/fUi1Nm63D97PQKqDMr7baTY0yDq0qo64CHlJXXZn9w6gA86uAYr8a8r5nqzi44uNVyxugVUBRtkrvbvf60krsazG/Cij2q1Zn/0ofwJ9ndgVQ6gHSXlW34gdSlwCtAgrr6l6ttqe+vR6IVgFlfYD7uSth0NoFbLwXAHiGX01vVPk0Sym81FXAc85duaeqMjqIVgH1Wg0TAvGQwPj6AHUV8JRzV9bYVRFzOisArQLK+wBFrndLQF0F1GmVg5QBAQEB/w/8BZw5UNX/s1UuAAAAAElFTkSuQmCC", "kotekUrl": "https://wierszykidladzieci.net.pl/julian-tuwim/kotek/", "briefing": ["ברוכים הבאים למירוץ של סבא דוד!", "היום תעברו במסלול שמספר את הסיפור של סבא. לאן? את זה תצטרכו לגלות בעצמכם, רמז אחרי רמז.", "אמנם כולנו נוסעים יחד במיניבוס, אבל המירוץ עצמו מתקיים בקבוצות.", "בכל תחנה תקבלו משימה. רק אחרי שהקבוצה שלכם תבצע אותה עד הסוף, היא תקבל את הרמז לתחנה הבאה.", "הקבוצה הראשונה שתפענח את הרמז ותלחש למנחה את התשובה הנכונה, תזכה ב־100 ש״ח.", "מי שמסיים את המשימה מהר יותר, מקבל את הרמז ראשון.", "אסור לגלות את התשובה לקבוצות האחרות לפני שהמיניבוס יוצא לדרך. מי שמגלה, משלם קנס.", "זכרו: יש כאן כסף, יש כאן כבוד, ויש כאן סבא אחד שמסתכל. בהצלחה!"], "rules": [["כסף פתיחה לכל קבוצה", "300 ש״ח"], ["הקבוצה הראשונה שלוחשת למנחה את הפתרון הנכון לרמז", "+100 ש״ח"], ["בקשת רמז נוסף מהמנחה", "רמז ראשון 30 ש״ח, רמז שני 60 ש״ח"], ["תשובה שגויה למנחה", "10 ש״ח לכל ניסיון"], ["בונוס השתתפות: כל חברי הקבוצה לקחו חלק פעיל במשימה", "+50 ש״ח בכל תחנה"], ["קנס רמאות (העתקה מקבוצה אחרת, הצעת שוחד למארגנים)", "100 ש״ח לכל עבירה"]], "rulesNotes": ["כולם נוסעים יחד במיניבוס. משימה נחשבת גמורה רק כשהמנחה מאשר אותה.", "פותרים את הרמזים ביחד. מותר לחשוב, להתווכח ולשאול את סבא (על אחריותכם, לא תמיד הוא ידע את התשובה).", "את הפתרון לוחשים למנחה, לא צועקים.", "בסוף היום, הקבוצה עם הכי הרבה כסף מנצחת."], "poem": [{"title": "בית ראשון", "lines": ["מיאוצ'י קוטק: מיאו!", "צוש טי, קוטקו, מיאל?", "מיאוום יא מישצ'קה מלצ'קה,", {"miss": "טראז פוסטה יסט מישצ'קה,", "note": "← השורה שסבא לא לימד"}, "א ישצ'ה בים חצ'יאל."]}, {"title": "בית שני", "lines": ["וזדיחה קוטק: או!", "צו צ'י, קוטקו, צו?", "שנילה מי שייה ויילקה ז'קה,", "ויילקה ז'קה, פֶּוְנָה מלֶקה,", "אז' פו סאמו דנו."]}, {"title": "בית שלישי", "lines": ["פיסנאו קוטק: פי...", "פיי, קוטצ'קו, פיי!", "סקוליל אוגון, ז'מרוז'יל שליפייה,", "שפי – אי וֶה שנייה מלצ'קו חליפייה,", "בו זנוב מו שייה שני."]}], "steps": [{"id": "t1", "kind": "task", "label": "משימה 1", "station": 1, "lines": ["במשימה הבאה תצטרכו להשיט צי של אוניות בקישון.", "הנחל זורם אל נמל חיפה, לשם הגיע סבא באונייה.", "היום כל אחד מכם בונה אונייה משלו.", "שלב א׳: לכל קבוצה יש 5 דקות וערימת ניירות בצבע של הקבוצה. כל אחד מחברי הקבוצה מקפל כמה שיותר סירות נייר.", "שלב ב׳: כל הקבוצות עומדות יחד על הגדה בקו הזינוק, ומשיטות את הסירות בקישון באותו רגע.", "כל סירה שווה 10 ₪.", "הקבוצה שהסירה שלה מגיעה ראשונה לסימון שבהמשך הגדה, מקבלת את הרמז ראשונה."]}, {"id": "c1", "kind": "clue", "label": "רמז 1", "station": 1, "lines": ["במקום אליו אתם נוסעים תמצאו שלושה שלטים:", "האחד מכוון למקום שם חותכים לפרוסות (עבות או דקות דקות).", "השני למקום בו יוצאים סודות.", "הנקודה השנייה שלנו נמצאת בכיוון של השלט השלישי.", "הצרפתים בנו אותו לחקלאות,", "שייח׳ הותיר בו את חותמו,", "ושמו מנציח צעיר שיצא בלילה אל הגשרים ולא שב.", "נקודה חשובה: השם שהיה כתוב על דופן האונייה של סבא, הוא גם ארץ המוצא של כמה מהאנשים שבחרו לגור בקרבתו, וכשנגיע אליהם נראה שבדיוק השבוע גם הם חוגגים 80."]}, {"id": "t2", "kind": "task", "label": "משימה 2", "station": 2, "poem": true, "lines": ["במשימה הבאה תתחברו לבית, וליתר דיוק לשירים שמזכירים את הבית.", "כמו שמבצר יחיעם לא נבנה בבת אחת. קודם הייתה כאן חווה מבוצרת של הצלבנים, אחר כך המסדר הטבטוני בנה עליה מבצר, ובמאה ה־18 בנה דאהר אל־עמר מבצר חדש על החורבות. שכבה על שכבה.", "גם הדקלום של סבא, שכולנו מכירים בשם \"מיאו\", נבנה בית על בית.", "את הבית הראשון כולנו יודעים בעל פה,", "או לפחות ככה חשבנו,", "אבל כמו במבצר - תמיד יש תגליות.", "מסתבר שסבא לימד אותנו את הבית הראשון בלבד וגם ממנו הוא החסיר שורה, כלומר היו לנו רק את היסודות.", "המשימה היא לדקלם את השיר.", "כל חברי הקבוצה מדקלמים יחד את השיר כולו, כל שלושה בתים, ומצלמים את עצמם בווידאו.", "סבא יהיה השופט, ויתן ציון לכל קבוצה.", "על דקלום מושלם הקבוצה מקבלת 200 ש״ח.", "על כל חבר קבוצה שלא משתתף בדקלום, יורדים לקבוצה 20 ש״ח."]}, {"id": "c2", "kind": "clue", "label": "רמז 2", "station": 2, "lines": ["לנקודה הבאה יש פוטנציאל לגלות הרבה סודות, אנשים כנראה השתגעו שם ולכן הם טיפסו על הקירות.", "הבדיחה אומרת שיש שם אישה שגמרו לה את המים, וחנוכת הבית קרתה בדיוק שבוע לפני החתונה של סבא וסבתא."]}, {"id": "t3", "kind": "task", "label": "משימה 3", "station": 3, "lines": ["במשימה הבאה תצטרכו לשמוע מה הקירות לוחשים.", "אומרים שלקירות יש אוזניים. היום נבדוק כמה טובות האוזניים שלכם.", "שלב א׳, טלפון שבור: עמדו בשורה. ליאת ולירון ילחשו לראשון בשורה משפט אחד. כל אחד לוחש את המשפט לבא אחריו, פעם אחת בלבד ובלי לחזור עליו. האחרון אומר אותו בקול.", "שלב ב׳: המשפט לקוח מהשיר שסבא הכי אוהב. גלו מה השיר.", "שלב ג׳: מצאו בין הקירות המדברים את הציור שמסמל את השיר, הצטלמו מולו כל הקבוצה, ושלחו את התמונה למועצת השבט."]}, {"id": "c3", "kind": "clue", "label": "רמז 3", "station": 3, "lines": ["נבואה מרמזת שהלבנון ייפול בו בגבורה.", "אם הייתי פחות 9, האקלים בי היה שונה.", "הקצה שלי מחוץ לתחום, כי ממנו אני מקשיב לשמיים. ואת המעקה שלי מחזיקים 121 מלאכים, מהם נפרדנו בעצב כשסבא היה בן 60."]}, {"id": "t4", "kind": "task", "label": "משימה 4", "station": 4, "lines": ["במשימה הבאה, האחרונה במירוץ, תצטרכו להגן על השמיים.", "אתם עומדים עכשיו ליד מערך ההגנה של חיל האוויר. בשנת 1965 הוקמה בישראל יחידת ההוק הראשונה, טילי קרקע־אוויר שנועדו להפיל מטוסי אויב, וסבא היה בין המקימים של מערך ההוק.", "אבל סבא לא רק יירט מטוסים: במשך שנים רבות הוא גם שיחק טניס. לכן היום סוללת ההוק שלכם יורה כדורי טניס.", "שלב א׳, בחניון: \"סוללת ההוק של סבא\". המנחה משגר לאוויר \"מטוס אויב\", כדור ים גדול. כל קבוצה בתורה מיירטת אותו בכדורי טניס, כדור אחד לכל אחד.", "על כל כדור טניס שפוגע, הקבוצה מקבלת 20 ש״ח. לכל קבוצה יש שני ניסיונות.", "אחד מחברי הצוות המנחה יצלם בווידאו לבקרה."]}, {"id": "t4b", "kind": "task", "label": "משימה 4 · שלב ב׳", "station": 4, "lines": ["שלב ב׳, במרפסת התצפית.", "המרפסת הזאת היא גם אתר הנצחה, ולכן את השלב הזה עושים בשקט ובכבוד.", "קבלו מפה אילמת ורשמו על דף כמה שיותר אתרים שאתם מזהים. כל אתר שווה 10 ש״ח."]}, {"id": "end", "kind": "finish", "label": "סיום המירוץ", "station": 4, "lines": ["הגעתם לקו הסיום!", "מנמל חיפה ועד גובה 1,008 מטרים, עברתם את הדרך של סבא דוד. עכשיו סופרים את הכסף. הקבוצה עם הכי הרבה כסף מנצחת, אבל כולנו יודעים מי המנצח האמיתי של היום: סבא דוד, מזל טוב ליום הולדת 80!"]}], "codes": [["4393", "1427", "8392", "7173", "7368", "4313", "1875", "8387", "2671"], ["9235", "1266", "2276", "6433", "4229", "9500", "5615", "1875", "3584"], ["6470", "8031", "6660", "7636", "1055", "5285", "5294", "7884", "5791"], ["1478", "6725", "3580", "6739", "8036", "4892", "9666", "5681", "6034"]], "stations": [{"n": 1, "name": "תחנת הקפה ליד נחל הקישון", "task": "t1", "clue": "c1", "equip": "דפי A4 עבים בצבע שונה לכל קבוצה, סימון סוף מסלול (כ־10 מטרים במורד הזרם).", "notes": [], "answer": "מבצר יחיעם.", "hints": []}, {"n": 2, "name": "מבצר יחיעם", "task": "t2", "clue": "c2", "equip": "טלפון לצילום לכל קבוצה (שלהם). הברקוד מוביל לעמוד השיר באתר wierszykidladzieci.net.pl, שבו יש גם הקלטה של הדקלום. לתאם מראש עם סבא שהוא השופט.", "notes": [["ניקוד", "דקלום מושלם 200 ש״ח; כל חבר קבוצה שלא משתתף מוריד 20 ש״ח."]], "answer": "הקירות המדברים במושב שתולה.", "hints": ["חפשו יישוב ששמו נשמע כאילו מישהו שתל אותו ליד הגבול. המיקום מחכה בקצה המזרחי שלו.", "אומרים שלקירות יש אוזניים. במקום שאליו אתם נוסעים, הם כבר התחילו לספר."]}, {"n": 3, "name": "הקירות המדברים בשתולה", "task": "t3", "clue": "c3", "equip": "", "notes": [["המשפט ללחישה", "\"הזכה שבתפילות\" (שורה 3 בבית הראשון)."], ["השיר", "\"שיר לשלום\", מילים יענקל׳ה רוטבליט, לחן יאיר רוזנבלום, להקת הנח״ל, 1969."], ["הציור הנכון", "היונה עם עלה הזית."], ["ניקוד", "50 ש״ח אם המשפט הגיע לאחרון בשורה בלי שינוי, 50 ש״ח על זיהוי השיר, 50 ש״ח על תמונה מול הציור הנכון."]], "answer": "מצפה הר אדיר.", "hints": ["חפשו את הפסוק בישעיהו פרק י׳.", "שם נרדף למטוס הקרב F-35I."]}, {"n": 4, "name": "מצפה הר אדיר (תחנת הסיום)", "task": "t4", "task2": "t4b", "clue": null, "equip": "15 כדורי טניס, 2 כדורי ים, מטר למדוד 5 מטר, מפה אילמת לכל קבוצה, דפים ועטים.", "notes": [], "answer": null, "hints": []}]};
+/* Shared helpers for both apps. DATA is injected by the build. */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const $ = (sel, root=document) => root.querySelector(sel);
+function fnv(str){let h=0x811c9dc5;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}return h.toString(16).padStart(8,"0");}
+function store(key){
+  let ok=true;
+  try{const k="__t";localStorage.setItem(k,"1");localStorage.removeItem(k);}catch(e){ok=false;}
+  return {ok,
+    get(){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null;}catch(e){return null;}},
+    set(v){try{localStorage.setItem(key,JSON.stringify(v));}catch(e){}}};
+}
+let toastTimer=null;
+function toast(msg){const t=$("#toast");if(!t)return;t.textContent=msg;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.hidden=true;},2600);}
+const TEAM_VAR = i => `var(--t${i})`;
+const shekel = n => (n<0?"−":"")+Math.abs(n).toLocaleString("he-IL")+" ₪";
+const signed = n => (n>0?"+":n<0?"−":"")+Math.abs(n).toLocaleString("he-IL")+" ₪";
+
+function poemHTML(){
+  return `<div class="poem">${DATA.poem.map(st=>`<div class="st"><b>${esc(st.title)}</b>${st.lines.map(l=>
+    typeof l==="string"?`<div>${esc(l)}</div>`:`<div><span class="miss">${esc(l.miss)}</span><span class="note">${esc(l.note)}</span></div>`).join("")}</div>`).join("")}</div>`;
+}
+function stepCardHTML(step, teamName){
+  const sub = step.kind==="clue" ? "רמז לתחנה הבאה" : step.kind==="finish" ? "להקראה בקול" : `תחנה ${step.station}`;
+  let body = step.lines.map((l,i)=>`<p${i===0&&step.kind==="task"?' class="open"':""}>${esc(l)}</p>`).join("");
+  if(step.poem){
+    body += `<div class="qr"><img src="${DATA.qr}" alt="ברקוד לעמוד השיר"><div class="t"><span>סרקו את הברקוד כדי לשמוע את השיר בפולנית.</span>
+      <a class="btn alt" href="${esc(DATA.kotekUrl)}" target="_blank" rel="noopener">פתיחת עמוד השיר בטלפון הזה</a></div></div>
+      <p>למתקשים, מילות הדקלום כולו בעברית:</p>${poemHTML()}`;
+  }
+  return `<article class="rc ${step.kind}" id="card-${step.id}">
+    <div class="head"><span class="kind">${esc(step.label)}</span><span class="sub">${esc(teamName?`קבוצה: ${teamName}`:sub)}</span></div>
+    <div class="body">${body}</div>
+    <div class="foot">✦ המירוץ של סבא דוד · Celebrating <b>80</b> ✦</div></article>`;
+}
+function briefingHTML(open){
+  return `<details class="fold" id="d-brief"${open?" open":""}><summary>תדריך פתיחה</summary><div class="in">${DATA.briefing.map((l,i)=>`<p${i===0?' style="font-weight:600"':""}>${esc(l)}</p>`).join("")}</div></details>
+  <details class="fold" id="d-rules"><summary>חוקי המירוץ</summary><div class="in"><div class="tablewrap"><table class="rules"><tbody>${DATA.rules.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table></div>
+  ${DATA.rulesNotes.map(l=>`<p>${esc(l)}</p>`).join("")}</div></details>`;
+}
+function heroHTML(title, eyebrow){
+  return `<div class="hero"><div class="mark" aria-hidden="true"><span class="eighty">8<span>0</span></span><span class="tribe">✦ Erman's tribe · Celebrating 80 ✦</span></div>
+    <h1>${esc(title)}</h1>${eyebrow?`<p class="eyebrow">${esc(eyebrow)}</p>`:""}</div>`;
+}
+/* Re-rendering from live data must not wipe what the person is typing or which sections are open. */
+function keepUI(app, fn){
+  const vals={}, opens={}; const f=document.activeElement; const fid=f&&f.id; let sel=null;
+  app.querySelectorAll("input[id],textarea[id]").forEach(e=>vals[e.id]=e.value);
+  app.querySelectorAll("details[id]").forEach(d=>opens[d.id]=d.open);
+  try{ if(fid&&f.selectionStart!=null) sel=[f.selectionStart,f.selectionEnd]; }catch(e){}
+  fn();
+  Object.entries(vals).forEach(([id,v])=>{const e=document.getElementById(id); if(e&&e.type!=="hidden") e.value=v;});
+  Object.entries(opens).forEach(([id,o])=>{const d=document.getElementById(id); if(d) d.open=o;});
+  if(fid){const e=document.getElementById(fid); if(e){e.focus({preventScroll:true}); try{ if(sel) e.setSelectionRange(sel[0],sel[1]); }catch(x){}}}
+}
+
+const START = 300;
+const LS = store("sabaRace_v2");
+let L = Object.assign({team:null, codeUnlocked:-1, tab:"bank", sel:0, station:1, guide:0, outbox:[], cacheTx:{}, cacheTeams:{}, preview:null, seen:-1, mode:"auto"}, LS.get()||{});
+function saveL(){LS.set(L);}
+const srv = {tx:L.cacheTx||{}, teams:L.cacheTeams||{}, live:false, stale:false, err:false};
+let db=null, canEdit=false, canWrite=null, localTest=false, writeDenied=false, flushing=false, retryTimer=null;
+const HOST_CODE="0412";
+const isHost = () => L.mode==="host" || (L.mode==="auto" && canEdit);
+/* A host who came in by the code but has no edit right on the server: show everything, block money and card changes so the bank never splits. */
+const bankLocked = () => !canEdit && !localTest && (!db || canWrite===false || writeDenied);
+let ui = {hostWin:false, hostErr:"", counts:{}, armed:null, armedTimer:null, confirmReset:false, confirmSwitch:false, logAll:false, err:"", pick:null, scrollTo:null};
+
+/* ---------- merged state: server snapshot + this phone's unsent changes ---------- */
+function txAll(){
+  const m=Object.assign({}, srv.tx);
+  for(const o of L.outbox){ if(o.op==="add") m[o.id]=o.data; else if(o.op==="del") delete m[o.id]; }
+  return Object.entries(m).map(([id,d])=>({id,...d})).sort((a,b)=>a.t-b.t);
+}
+function teamsAll(){
+  const out=[0,1,2,3].map(t=>({name:`קבוצה ${t+1}`, progress:-1, ...(srv.teams["t"+t]||{})}));
+  for(const o of L.outbox) if(o.op==="team") out[o.t]=Object.assign({},out[o.t],o.data);
+  return out;
+}
+const tname = t => (teamsAll()[t].name||"").trim() || `קבוצה ${t+1}`;
+const balOf = (t, txs=txAll()) => START + txs.filter(x=>x.team===t).reduce((a,x)=>a+x.amount,0);
+
+/* ---------- writes: queued on the phone, sent in order, retried when the signal returns ---------- */
+function enqueue(op){ if(bankLocked()){ toast("צפייה בלבד: אין לחשבון הזה הרשאת עריכה"); return; } L.outbox.push(op); saveL(); render(); flush(); }
+function newId(){ return "x"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function addTx(team, amount, label){
+  enqueue({op:"add", id:newId(), data:{team, amount, label, station:L.station, t:Date.now()}});
+  toast(`${tname(team)}: ${signed(amount)}`);
+}
+function delTx(id){
+  const i=L.outbox.findIndex(o=>o.op==="add"&&o.id===id);
+  if(i>=0){ L.outbox.splice(i,1); saveL(); render(); } else enqueue({op:"del", id});
+  toast("הרישום בוטל");
+}
+function setTeam(t, patch){
+  const data=Object.assign({}, teamsAll()[t], patch);
+  L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));
+  enqueue({op:"team", t, data:{name:data.name, progress:data.progress}});
+}
+async function flush(){
+  if(!db||flushing||writeDenied) return;
+  flushing=true;
+  try{
+    while(L.outbox.length){
+      const o=L.outbox[0];
+      try{
+        if(o.op==="add") await db.collection("tx").doc(o.id).set(o.data);
+        else if(o.op==="del") await db.doc("tx/"+o.id).delete();
+        else if(o.op==="team") await db.doc("teams/t"+o.t).set(o.data);
+        L.outbox.shift(); saveL();
+      }catch(e){
+        const c=e&&e.code;
+        if(c==="invalid_argument"||c==="not_granted"||c==="revoked"){ writeDenied=true; break; }
+        if(c==="quota_exceeded"){ toast("מסד הנתונים מלא. אי אפשר לרשום עוד."); break; }
+        clearTimeout(retryTimer); retryTimer=setTimeout(flush, 12000); break;
+      }
+    }
+  } finally { flushing=false; render(); }
+}
+addEventListener("online", ()=>flush());
+
+/* ---------- reads: live subscriptions, once ---------- */
+function subscribe(){
+  const timer=setTimeout(()=>{ if(!srv.live){ srv.stale=true; render(); } }, 10000);
+  const ok=snap=>{ if(!snap.metadata.fromCache){ srv.live=true; srv.stale=false; clearTimeout(timer);} };
+  db.collection("tx").onSnapshot(snap=>{
+    srv.tx=Object.fromEntries(snap.docs.map(d=>[d.id,d.data()])); ok(snap); L.cacheTx=srv.tx; saveL(); render();
+  }, ()=>{ srv.err=true; srv.live=false; clearTimeout(timer); render(); });
+  db.collection("teams").onSnapshot(snap=>{
+    srv.teams=Object.fromEntries(snap.docs.map(d=>[d.id,d.data()])); ok(snap); L.cacheTeams=srv.teams; saveL(); render();
+  }, ()=>{ srv.err=true; srv.live=false; clearTimeout(timer); render(); });
+}
+/* ---------- standalone website: Firebase Realtime Database over its REST + streaming API ---------- */
+const FB_URL = "";
+function fbDb(base){
+  base=base.replace(/\/+$/,"")+"/race";
+  const fail=()=>{ throw {code:"unavailable"}; };
+  async function req(path, method, body){
+    let r; try{ r=await fetch(`${base}/${path}.json`,{method, body:body===undefined?undefined:JSON.stringify(body)}); }catch(e){ fail(); }
+    if(r.status===401||r.status===403) throw {code:"invalid_argument"};
+    if(!r.ok) fail();
+  }
+  const docRef=p=>({set:d=>req(p,"PUT",d), delete:()=>req(p,"DELETE")});
+  const coll=c=>({
+    doc:id=>docRef(`${c}/${id}`),
+    onSnapshot(next, err){
+      let tree={}; const es=new EventSource(`${base}/${c}.json`);
+      const emit=()=>next({docs:Object.entries(tree).filter(([,v])=>v&&typeof v==="object").map(([id,v])=>({id,exists:true,data:()=>v,metadata:{fromCache:false}})),metadata:{fromCache:false,hasPendingWrites:false}});
+      const apply=(path,data,merge)=>{
+        const parts=path.split("/").filter(Boolean);
+        if(!parts.length){ tree = merge ? Object.assign({},tree,data||{}) : (data||{}); if(merge) for(const k in data) if(data[k]===null) delete tree[k]; return; }
+        const id=parts[0];
+        if(parts.length===1){ if(data===null) delete tree[id]; else tree[id]= merge ? Object.assign({},tree[id],data) : data; return; }
+        const cur=Object.assign({},tree[id]||{}); cur[parts[1]]=data; tree[id]=cur;
+      };
+      es.addEventListener("put",e=>{const m=JSON.parse(e.data);apply(m.path,m.data,false);emit();});
+      es.addEventListener("patch",e=>{const m=JSON.parse(e.data);apply(m.path,m.data,true);emit();});
+      es.addEventListener("cancel",()=>{err&&err({code:"invalid_argument"});});
+      es.onerror=()=>{err&&err({code:"unavailable"});};
+      return ()=>es.close();
+    }});
+  return {collection:coll, doc:p=>docRef(p)};
+}
+async function boot(){
+  if(FB_URL){ db=fbDb(FB_URL); canWrite=true; render(); subscribe(); flush(); setInterval(()=>{ if(L.outbox.length) flush(); }, 15000); return; }
+  render();
+  const c=window.claude;
+  if(!c||!c.use){ localTest=true; if(location.hash==="#host-local"){ canEdit=true; render(); } return; }
+  const [user, d] = await Promise.all([c.use("user"), c.use("db")]);
+  canEdit = user ? await user.canEdit() : false;
+  const w = user ? await user.can("data.write") : null;
+  canWrite = canEdit ? true : w;
+  db = d;
+  if(db){ subscribe(); flush(); }
+  render();
+}
+
+/* ---------- shared bits ---------- */
+function statusHTML(){
+  if(!db) return `<span class="live off"><i></i>${isHost()?"שמור בטלפון הזה":"בלי עדכונים חיים"}</span>`;
+  const pend=L.outbox.length;
+  if(srv.live && !pend) return `<span class="live"><i></i>מחובר</span>`;
+  return `<span class="live off"><i></i>${pend?`${pend} ממתינים לקליטה`:"אין קליטה"}</span>`;
+}
+function render(){ keepUI($("#app"), ()=>{ $("#app").innerHTML = (isHost() && L.preview===null) ? hostHTML() : teamHTML(); }); isHost()&&L.preview===null ? bindHost() : bindTeam();
+  if(ui.scrollTo){ const el=document.getElementById(ui.scrollTo); ui.scrollTo=null; if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); } }
+
+/* =================== TEAM VIEW =================== */
+function myTeam(){ return L.preview!==null ? L.preview : L.team; }
+function unlockedFor(t){ return Math.max(teamsAll()[t].progress, L.preview!==null ? -1 : L.codeUnlocked); }
+function teamHTML(){
+  const t=myTeam();
+  if(t===null) return pickHTML();
+  const steps=DATA.steps, txs=txAll(), u=unlockedFor(t), next=steps[u+1];
+  if(L.preview===null && u>L.seen){ ui.scrollTo="card-"+steps[u].id; toast(`${steps[u].label} נפתחה`); L.seen=u; saveL(); }
+  let h=`<header class="bar"><div class="who"><span class="dot" style="background:${TEAM_VAR(t)}"></span><span class="name">${esc(tname(t))}</span></div>
+    <div class="mybal"><b>${db||isHost()?shekel(balOf(t,txs)):"—"}</b>${statusHTML()}</div></header>`;
+  if(L.preview!==null) h+=`<div class="warn">זו תצוגה מקדימה של מסך הקבוצה. <button class="btn alt" id="endprev" style="min-height:36px;padding:4px 12px;margin-inline-start:6px">חזרה למנחים</button></div>`;
+  else if(!db) h+=`<div class="warn">כדי לראות את היתרה ואת הכרטיסיות מתעדכנות לבד, פתחו את הקישור כשאתם מחוברים לחשבון claude.ai. בינתיים אפשר לפתוח כרטיסיות עם קוד מהמנחה.</div>`;
+  else if((srv.stale||srv.err)&&!srv.live) h+=`<div class="warn">אין חיבור כרגע. מוצג המצב האחרון שהתקבל, והוא יתעדכן כשהקליטה תחזור. אפשר לפתוח כרטיסייה עם קוד מהמנחה.</div>`;
+  if(ui.confirmSwitch) h+=`<div class="card confirm"><h3>להחליף קבוצה?</h3><p>הכרטיסיות שנפתחו בקוד יינעלו שוב בטלפון הזה.</p>
+      <div class="row"><button class="btn bad" id="swyes">כן, להחליף</button><button class="btn alt" id="swno">ביטול</button></div></div>`;
+  h+=heroHTML("המירוץ של סבא דוד","✦ מירוץ משפחתי לכבוד יום הולדת 80 ✦");
+  if(db||isHost()){
+    const order=[0,1,2,3].map(x=>({x,b:balOf(x,txs)})).sort((a,b)=>b.b-a.b);
+    h+=`<ul class="mini" aria-label="היתרות של כל הקבוצות">${order.map(o=>`<li class="${o.x===t?"me":""}" style="--c:${TEAM_VAR(o.x)}"><span>${esc(tname(o.x))}</span><b>${shekel(o.b)}</b></li>`).join("")}</ul>`;
+  }
+  h+=briefingHTML(u<0);
+  h+=`<div class="sect"><h2>הכרטיסיות שלכם</h2><span class="muted small mono">${Math.max(0,u+1)}/${steps.length}</span></div>`;
+  for(let i=0;i<=u;i++) h+=stepCardHTML(steps[i], tname(t));
+  if(next){
+    const when = next.kind==="clue"?"נפתח אחרי שהמנחה מאשר שהמשימה הושלמה.":next.kind==="finish"?"נפתח בסוף המירוץ.":"נפתחת כשמגיעים לתחנה.";
+    h+=`<div class="lock ${next.kind}" id="lockcard"><div class="lk"><span class="tag">${esc(next.label)}</span><span class="pill">נעול</span></div>
+      <p class="muted">${when} ${db?"המנחה פותח אותה מהטלפון שלו והיא תופיע כאן לבד. אם אין קליטה, הקלידו את הקוד שהמנחה נותן.":"הקלידו את הקוד שהמנחה נותן."}</p>
+      ${L.preview===null?`<form class="codein" id="codeform" autocomplete="off"><input id="code" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" aria-label="קוד פתיחה"><button class="btn" type="submit">פתיחה</button></form>`:""}
+      ${ui.err?`<p class="err" role="alert">${esc(ui.err)}</p>`:""}</div>`;
+    const rest=steps.slice(u+2);
+    if(rest.length) h+=`<div class="ahead" aria-label="בהמשך">${rest.map(s=>`<span>${esc(s.label)}</span>`).join("")}</div>`;
+  }
+  if(L.preview===null) h+=`<div class="row"><button class="btn ghost" id="sw">החלפת קבוצה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>`+hostWinHTML();
+  return h;
+}
+function pickHTML(){
+  return `${heroHTML("המירוץ של סבא דוד","✦ מירוץ משפחתי לכבוד יום הולדת 80 ✦")}
+    <div class="card"><h2>באיזו קבוצה אתם?</h2><p class="muted">טלפון אחד לכל קבוצה מספיק.</p>
+    <div class="pick">${[0,1,2,3].map(i=>`<button type="button" data-t="${i}" aria-pressed="${ui.pick===i}"><span class="sw" style="background:${TEAM_VAR(i)}"></span><b>${esc(tname(i))}</b></button>`).join("")}</div>
+    <button class="btn" id="go"${ui.pick===null?" disabled":""}>מתחילים</button></div>
+    <button class="btn ghost" id="hostin">כניסת מנחים</button>${hostWinHTML()}`;
+}
+function hostWinHTML(){
+  if(!ui.hostWin) return "";
+  return `<div class="card" id="hostwin"><h3>כניסת מנחים</h3><p class="muted small">למנחים בלבד. משתתפים שהגיעו לכאן בטעות יכולים ללחוץ ״חזרה״.</p>
+    <form class="codein" id="hostform" autocomplete="off"><input id="hcode" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" aria-label="קוד מנחים"><button class="btn" type="submit">כניסה</button></form>
+    ${ui.hostErr?`<p class="err" role="alert">${esc(ui.hostErr)}</p>`:""}<button class="btn alt" id="hostcancel">חזרה</button></div>`;
+}
+function bindTeam(){
+  const hi=$("#hostin"); if(hi) hi.onclick=()=>{ui.hostWin=true;ui.hostErr="";render();const w=$("#hostwin");if(w){w.scrollIntoView({behavior:"smooth",block:"center"});$("#hcode").focus({preventScroll:true});}};
+  const hc=$("#hostcancel"); if(hc) hc.onclick=()=>{ui.hostWin=false;ui.hostErr="";render();};
+  const hf=$("#hostform"); if(hf) hf.onsubmit=e=>{e.preventDefault();const v=$("#hcode").value.trim();$("#hcode").value="";
+    if(v===HOST_CODE){ui.hostWin=false;ui.hostErr="";L.mode="host";L.preview=null;saveL();render();scrollTo(0,0);toast("נכנסת למסך המנחים");}
+    else{ui.hostErr="הקוד שגוי.";render();}};
+  document.querySelectorAll(".pick button").forEach(b=>b.onclick=()=>{ui.pick=+b.dataset.t;render();});
+  const go=$("#go"); if(go) go.onclick=()=>{ if(ui.pick===null) return; L.team=ui.pick; L.codeUnlocked=-1; L.seen=teamsAll()[ui.pick].progress; saveL(); render(); scrollTo(0,0); };
+  const sw=$("#sw"); if(sw) sw.onclick=()=>{ui.confirmSwitch=true;render();scrollTo({top:0,behavior:"smooth"});};
+  const y=$("#swyes"); if(y) y.onclick=()=>{L.team=null;L.codeUnlocked=-1;L.seen=-1;ui.pick=null;ui.confirmSwitch=false;saveL();render();};
+  const n=$("#swno"); if(n) n.onclick=()=>{ui.confirmSwitch=false;render();};
+  const ep=$("#endprev"); if(ep) ep.onclick=()=>{L.preview=null;saveL();render();scrollTo(0,0);};
+  const f=$("#codeform"); if(f) f.onsubmit=e=>{e.preventDefault(); const v=$("#code").value.trim(); $("#code").value=""; tryCode(v);};
+}
+function tryCode(code){
+  const t=L.team;
+  if(!/^\d{4}$/.test(code)){ ui.err="הקוד הוא 4 ספרות."; render(); shakeLock(); return; }
+  const k=DATA.codes[t].lastIndexOf(code);
+  if(k<0){ ui.err="הקוד לא מתאים לקבוצה שלכם. בדקו את המספר מול המנחה."; render(); shakeLock(); return; }
+  ui.err="";
+  if(k>unlockedFor(t)){ L.codeUnlocked=Math.max(L.codeUnlocked,k); saveL(); }
+  else toast("הכרטיסייה הזאת כבר פתוחה");
+  render();
+}
+function shakeLock(){const l=$("#lockcard");if(l){l.classList.remove("shake");void l.offsetWidth;l.classList.add("shake");}}
+
+/* =================== HOST VIEW =================== */
+const GENERAL = [
+  {amt:100, lb:"ראשונים ללחוש את הפתרון הנכון לרמז"},
+  {amt:-30, lb:"רמז ראשון בתשלום"},
+  {amt:-60, lb:"רמז שני בתשלום"},
+  {amt:-10, lb:"תשובה שגויה למנחה"},
+  {amt:50,  lb:"בונוס השתתפות: כל חברי הקבוצה לקחו חלק פעיל"},
+  {amt:-100,lb:"קנס רמאות"},
+];
+const STATION_ACTS = {
+  1:[{counter:"boats", per:10, lb:"סירות נייר", unit:"סירות", note:"כל סירה שווה 10 ₪"}],
+  2:[{amt:200, lb:"דקלום מושלם (לפי סבא)"},
+     {counter:"absent", per:-20, lb:"חברי קבוצה שלא השתתפו בדקלום", unit:"חברים", note:"20 ₪ לכל חבר"}],
+  3:[{amt:50, lb:"שלב א׳: המשפט הגיע לאחרון בלי שינוי"},
+     {amt:50, lb:"שלב ב׳: זיהוי השיר"},
+     {amt:50, lb:"שלב ג׳: תמונה מול הציור הנכון"}],
+  4:[{counter:"hits", per:20, lb:"שלב א׳: כדורי טניס שפגעו", unit:"פגיעות", note:"20 ₪ לכל פגיעה, בשני הניסיונות יחד"},
+     {counter:"sites", per:10, lb:"שלב ב׳: אתרים שזוהו במפה האילמת", unit:"אתרים", note:"10 ₪ לכל אתר"}],
+};
+function hostHTML(){
+  let h=`<header class="bar"><div class="who"><span class="dot" style="background:var(--accent)"></span><span class="name">המירוץ · מנחים</span></div><div style="display:flex;align-items:center;gap:10px">${statusHTML()}<button class="barbtn" id="toteam">מסך משתתפים</button></div></header>`;
+  if(bankLocked()) h+=`<div class="warn"><b>צפייה בלבד.</b> אפשר לראות את החוברת, את היתרות ואת הקודים ולתת לקבוצות קודים. רישום כסף ופתיחת כרטיסיות מהטלפון הזה ייפתחו רק אחרי שליאת תזמין את החשבון הזה במייל בתור Editor.</div>`;
+  else if(writeDenied) h+=`<div class="warn">השינויים לא נשמרים בשרת כי לחשבון הזה אין הרשאת עריכה. בקשו מליאת לשתף אתכם כעורכים (Editor).</div>`;
+  else if(!db) h+=`<div class="warn">אין סנכרון בתצוגה הזאת. הרישומים נשמרים בטלפון הזה ויישלחו כשהדף ייפתח עם חיבור לחשבון.</div>`;
+  else if((srv.stale||srv.err) && !srv.live) h+=`<div class="warn">אין קליטה כרגע. אפשר להמשיך לרשום: הרישומים נשמרים בטלפון ויישלחו לבד כשהקליטה תחזור. הקבוצות יכולות לפתוח כרטיסיות עם הקודים.</div>`;
+  const tabs=[["bank","בנק"],["guide","חוברת"],["codes","פתיחה"],["board","טבלה"],["set","הגדרות"]];
+  h+=`<nav class="tabs" role="tablist">${tabs.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${L.tab===k}">${l}</button>`).join("")}</nav>`;
+  const txs=txAll();
+  h+= `<div class="hostbody${bankLocked()?" locked":""}">`;
+  h+= L.tab==="bank"?bankHTML(txs): L.tab==="guide"?guideHTML(): L.tab==="codes"?codesHTML(): L.tab==="board"?boardHTML(txs): setHTML();
+  h+=`</div>`;
+  return h;
+}
+function actBtn(a,i,grp){ return `<button class="act ${a.amt>0?"plus":"minus"}" data-act="${grp}:${i}"><span class="amt">${signed(a.amt)}</span><span class="lb">${esc(a.lb)}</span></button>`; }
+function counterHTML(a,i){
+  const n=ui.counts[a.counter]||0;
+  return `<div class="counter"><div class="top"><b>${esc(a.lb)}</b><span class="muted small">${esc(a.note)}</span></div>
+    <div class="ctl"><button class="sq" data-cnt="${a.counter}" data-d="1" aria-label="עוד אחד">+</button><span class="n">${n}</span><button class="sq" data-cnt="${a.counter}" data-d="-1" aria-label="אחד פחות">−</button>
+    <button class="btn ${a.per>0?"good":"bad"}" data-cact="${i}"${n===0?" disabled":""}>רישום ${signed(n*a.per)}</button></div></div>`;
+}
+function bankHTML(txs){
+  const t=L.sel, sacts=STATION_ACTS[L.station];
+  const list=(ui.logAll?txs:txs.filter(x=>x.team===t)).slice().reverse();
+  const pendIds=new Set(L.outbox.filter(o=>o.op==="add").map(o=>o.id));
+  return `<div class="teams">${[0,1,2,3].map(x=>`<button class="tm" data-sel="${x}" aria-pressed="${t===x}" style="--c:${TEAM_VAR(x)}"><span class="nm">${esc(tname(x))}</span><span class="bal">${shekel(balOf(x,txs))}</span></button>`).join("")}</div>
+  <div class="card"><div class="secthead"><h2 style="color:${TEAM_VAR(t)}">${esc(tname(t))}</h2><span class="muted small">יתרה <b class="mono">${shekel(balOf(t,txs))}</b></span></div>
+   <div class="grp"><h3>תחנה</h3><div class="seg">${[1,2,3,4].map(n=>`<button data-st="${n}" aria-pressed="${L.station===n}">${n}</button>`).join("")}</div>
+    <p class="muted small">${esc(DATA.stations[L.station-1].name)}</p></div>
+   <div class="grp"><h3>ניקוד המשימה</h3>
+    ${sacts.some(a=>!a.counter)?`<div class="acts">${sacts.map((a,i)=>a.counter?"":actBtn(a,i,"s")).join("")}</div>`:""}
+    ${sacts.map((a,i)=>a.counter?counterHTML(a,i):"").join("")}</div>
+   <div class="grp"><h3>חוקי המירוץ <span class="muted">בכל תחנה</span></h3><div class="acts">${GENERAL.map((a,i)=>actBtn(a,i,"g")).join("")}</div></div>
+   <div class="grp"><h3>סכום אחר</h3><p class="muted small">למשל ציון חלקי של סבא בדקלום.</p>
+    <form id="custom" class="grp" autocomplete="off">
+     <div class="row"><input id="camt" inputmode="numeric" pattern="[0-9]*" placeholder="סכום ב־₪" aria-label="סכום" style="flex:1 1 120px">
+      <input id="clb" type="text" placeholder="סיבה" aria-label="סיבה" style="flex:2 1 160px"></div>
+     <div class="row"><button class="btn good" type="submit" data-sign="1">הוספה</button><button class="btn bad" type="submit" data-sign="-1">הורדה</button></div></form></div>
+  </div>
+  <div class="card"><div class="secthead"><h3>${ui.logAll?"כל הרישומים":"רישומים של "+esc(tname(t))}</h3><button class="undo" id="logall">${ui.logAll?"רק הקבוצה הזאת":"כל הקבוצות"}</button></div>
+   ${list.length?`<ul class="log">${list.map(x=>`<li><span class="dot" style="background:${TEAM_VAR(x.team)}"></span><span class="what">${esc(x.label)}<small>${esc(tname(x.team))} · תחנה ${x.station} · ${new Date(x.t).toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"})}${pendIds.has(x.id)?" · ממתין לקליטה":""}</small></span>
+     <span style="text-align:end"><span class="amt ${x.amount>0?"plus":"minus"}">${signed(x.amount)}</span><br><button class="undo${ui.armed===x.id?" armed":""}" data-undo="${esc(x.id)}">${ui.armed===x.id?"לבטל? כן":"ביטול"}</button></span></li>`).join("")}</ul>`
+     :`<p class="muted">עדיין אין רישומים. כל קבוצה מתחילה עם ${START} ₪.</p>`}
+  </div>`;
+}
+function guideHTML(){
+  const g=L.guide;
+  let h=`<div class="seg">${["פתיחה","1","2","3","4"].map((l,i)=>`<button data-guide="${i}" aria-pressed="${g===i}">${l}</button>`).join("")}</div>`;
+  if(g===0) return h+`<div class="card"><h2>תדריך פתיחה</h2><p class="muted small">להקראה בקול</p>${DATA.briefing.map((l,i)=>`<p${i===0?' style="font-weight:600"':""}>${esc(l)}</p>`).join("")}</div>
+      <div class="card"><h2>חוקי המירוץ</h2><div class="tablewrap"><table class="rules"><tbody>${DATA.rules.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table></div>${DATA.rulesNotes.map(l=>`<p>${esc(l)}</p>`).join("")}</div>`;
+  const s=DATA.stations[g-1], byId=id=>DATA.steps.find(x=>x.id===id);
+  h+=`<div class="secthead"><h2>תחנה ${s.n} · ${esc(s.name)}</h2><span class="muted small">לא להראות למשתתפים</span></div>`;
+  h+=stepCardHTML(byId(s.task));
+  const nb=[]; if(s.equip) nb.push(["ציוד למנחה",s.equip]); s.notes.forEach(n=>nb.push(n));
+  if(nb.length) h+=`<div class="hostnote">${nb.map(([k,v])=>`<p><b>${esc(k)}:</b> ${esc(v)}</p>`).join("")}</div>`;
+  if(s.task2) h+=stepCardHTML(byId(s.task2));
+  if(s.clue){
+    h+=stepCardHTML(byId(s.clue))+`<div class="answer">התשובה: ${esc(s.answer)}</div>`;
+    if(s.hints.length) h+=`<div class="grp"><h3>רמזים בתשלום</h3>${s.hints.map((x,i)=>`<div class="hint"><span class="c">${i===0?"רמז ראשון · 30 ש״ח":"רמז שני · 60 ש״ח"}</span><span>${esc(x)}</span></div>`).join("")}</div>`;
+  } else h+=stepCardHTML(byId("end"));
+  return h;
+}
+function codesHTML(){
+  const steps=DATA.steps, tm=teamsAll();
+  let h=`<p class="muted">״פתיחה לקבוצה״ מציג את הכרטיסייה הבאה בטלפון של הקבוצה. אם אין שם קליטה, תנו לקבוצה את הקוד.</p>`;
+  h+=[0,1,2,3].map(t=>{
+    const p=tm[t].progress, next=steps[p+1];
+    return `<div class="card codecard" style="--c:${TEAM_VAR(t)}"><div class="meta"><b>${esc(tname(t))}</b><span class="muted">${p<0?"עוד לא נפתחה אף כרטיסייה":"פתוח עד: "+esc(steps[p].label)}</span></div>
+      ${next?`<button class="btn good" data-give="${t}">פתיחה לקבוצה: ${esc(next.label)}</button>
+        <div class="muted small" style="text-align:center">קוד ל־${esc(next.label)}, אם אין קליטה</div><div class="big">${DATA.codes[t][p+1]}</div>
+        ${p>=0?`<button class="btn ghost" data-back="${t}">ביטול הפתיחה האחרונה</button>`:""}`
+      :`<p class="answer" style="text-align:center">כל הכרטיסיות נפתחו</p><button class="btn ghost" data-back="${t}">ביטול הפתיחה האחרונה</button>`}</div>`;
+  }).join("");
+  h+=`<details class="fold" id="d-codes"><summary>כל הקודים</summary><div class="in"><div class="tablewrap"><table class="codes"><thead><tr><th></th>${[0,1,2,3].map(t=>`<th style="color:${TEAM_VAR(t)}">${esc(tname(t))}</th>`).join("")}</tr></thead><tbody>
+    ${steps.map((s,i)=>`<tr><th style="text-align:start">${esc(s.label)}</th>${[0,1,2,3].map(t=>`<td class="mono${tm[t].progress>=i?" done":""}">${DATA.codes[t][i]}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <p class="muted small">קוד של כרטיסייה מאוחרת פותח גם את כל מה שלפניה.</p></div></details>`;
+  return h;
+}
+function boardHTML(txs){
+  const order=[0,1,2,3].map(t=>({t,b:balOf(t,txs)})).sort((a,b)=>b.b-a.b);
+  let rank=0,prev=null;
+  const rows=order.map((o,i)=>{if(o.b!==prev){rank=i+1;prev=o.b;}return {...o,rank};});
+  return `${heroHTML("טבלת המירוץ","")}<ol class="board">${rows.map(r=>`<li class="${r.rank===1?"first":""}" style="--c:${TEAM_VAR(r.t)}"><span class="rk">${r.rank}</span><span class="nm">${esc(tname(r.t))}</span><span class="bal">${shekel(r.b)}</span></li>`).join("")}</ol>
+   <p class="muted small" style="text-align:center">כל קבוצה התחילה עם ${START} ₪ · ${txs.length} רישומים</p>`;
+}
+function setHTML(){
+  return `<div class="card"><h2>שמות הקבוצות</h2><p class="muted small">השמות מופיעים גם בטלפונים של הקבוצות.</p>${[0,1,2,3].map(t=>`<label for="nm${t}"><span style="color:${TEAM_VAR(t)}">קבוצה ${t+1}</span><input id="nm${t}" type="text" maxlength="24" value="${esc(tname(t))}" data-name="${t}"></label>`).join("")}</div>
+  <div class="card"><h2>מה הקבוצות רואות</h2><p class="muted">תצוגה מקדימה של מסך הקבוצה, בלי לשנות כלום.</p><div class="row">${[0,1,2,3].map(t=>`<button class="btn alt" data-prev="${t}">${esc(tname(t))}</button>`).join("")}</div></div>
+  <div class="card"><h2>איפוס המירוץ</h2><p class="muted">מוחק את כל הרישומים ומחזיר את כל הכרטיסיות למצב נעול, אצל כולם. שמות הקבוצות נשמרים.</p>
+   ${ui.confirmReset?`<div class="row"><button class="btn bad" id="resetyes">כן, למחוק הכול</button><button class="btn alt" id="resetno">ביטול</button></div>`:`<button class="btn ghost" id="reset">איפוס</button>`}</div>`;
+}
+function bindHost(){
+  const all=(s,f)=>document.querySelectorAll(s).forEach(f);
+  const tt=$("#toteam"); if(tt) tt.onclick=()=>{L.mode="team";saveL();render();scrollTo(0,0);};
+  all("[data-tab]",b=>b.onclick=()=>{L.tab=b.dataset.tab;saveL();render();scrollTo(0,0);});
+  all("[data-sel]",b=>b.onclick=()=>{L.sel=+b.dataset.sel;ui.counts={};saveL();render();});
+  all("[data-st]",b=>b.onclick=()=>{L.station=+b.dataset.st;ui.counts={};saveL();render();});
+  all("[data-guide]",b=>b.onclick=()=>{L.guide=+b.dataset.guide;saveL();render();});
+  all("[data-act]",b=>b.onclick=()=>{const [g,i]=b.dataset.act.split(":");const a=(g==="g"?GENERAL:STATION_ACTS[L.station])[+i];addTx(L.sel,a.amt,g==="g"?a.lb:`תחנה ${L.station} · ${a.lb}`);});
+  all("[data-cnt]",b=>b.onclick=()=>{const k=b.dataset.cnt;ui.counts[k]=Math.max(0,Math.min(99,(ui.counts[k]||0)+(+b.dataset.d)));render();});
+  all("[data-cact]",b=>b.onclick=()=>{const a=STATION_ACTS[L.station][+b.dataset.cact];const n=ui.counts[a.counter]||0;if(!n)return;ui.counts[a.counter]=0;addTx(L.sel,n*a.per,`תחנה ${L.station} · ${a.lb}: ${n} ${a.unit}`);});
+  const cf=$("#custom"); if(cf) cf.onsubmit=e=>{e.preventDefault();const sign=+(e.submitter?.dataset.sign||1);const v=parseInt($("#camt").value,10);
+    if(!v||v<=0){toast("הקלידו סכום חיובי");return;} const lb=$("#clb").value.trim()||"סכום אחר"; $("#camt").value="";$("#clb").value=""; addTx(L.sel,sign*v,`תחנה ${L.station} · ${lb}`);};
+  all("[data-undo]",b=>b.onclick=()=>{const id=b.dataset.undo;
+    if(ui.armed===id){ui.armed=null;clearTimeout(ui.armedTimer);delTx(id);return;}
+    ui.armed=id;clearTimeout(ui.armedTimer);ui.armedTimer=setTimeout(()=>{ui.armed=null;render();},4000);render();});
+  const la=$("#logall"); if(la) la.onclick=()=>{ui.logAll=!ui.logAll;render();};
+  all("[data-give]",b=>b.onclick=()=>{const t=+b.dataset.give,p=teamsAll()[t].progress;if(p<DATA.steps.length-1){setTeam(t,{progress:p+1});toast(`${tname(t)}: ${DATA.steps[p+1].label} נפתחה`);}});
+  all("[data-back]",b=>b.onclick=()=>{const t=+b.dataset.back,p=teamsAll()[t].progress;if(p>=0) setTeam(t,{progress:p-1});});
+  all("[data-name]",inp=>inp.onchange=()=>{const t=+inp.dataset.name;const v=inp.value.trim()||`קבוצה ${t+1}`;if(v!==tname(t)) setTeam(t,{name:v});});
+  all("[data-prev]",b=>b.onclick=()=>{L.preview=+b.dataset.prev;saveL();render();scrollTo(0,0);});
+  const rs=$("#reset"); if(rs) rs.onclick=()=>{ui.confirmReset=true;render();};
+  const rn=$("#resetno"); if(rn) rn.onclick=()=>{ui.confirmReset=false;render();};
+  const ry=$("#resetyes"); if(ry) ry.onclick=()=>{
+    ui.confirmReset=false;
+    const ids=txAll().map(x=>x.id);
+    L.outbox=L.outbox.filter(o=>o.op!=="add");
+    ids.filter(id=>srv.tx[id]).forEach(id=>L.outbox.push({op:"del",id}));
+    [0,1,2,3].forEach(t=>{L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));L.outbox.push({op:"team",t,data:{name:tname(t),progress:-1}});});
+    saveL(); render(); flush(); toast("המירוץ אופס");
+  };
+}
+boot();
+</script>
+</body></html>

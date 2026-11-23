@@ -290,8 +290,9 @@ function keepUI(app, fn){
 }
 
 const START = 300;
-const VERSION = "1.4";
+const VERSION = "1.5";
 const CHANGES = {
+  "1.5": ["תיקון: אחרי איפוס של המנחים, גם כרטיסיות שקבוצה פתחה עם קוד נסגרות בכל הטלפונים שלה."],
   "1.4": ["תמונות של סבא דוד מהאלבום המשפחתי לאורך כל המשחק: בתדריך, בכרטיסיות ובכרטיס הסיום."],
   "1.3": ["קבוצת בקרה למנחים: בוחרים ״קבוצת בקרה״, מקלידים 0412, ועוברים על כל הכרטיסיות, התמונות והעיצובים בדיוק כמו שהקבוצות רואות.",
           "קבוצת הבקרה לא משנה כלום במירוץ: לא כסף, לא כרטיסיות של קבוצות אחרות.",
@@ -319,6 +320,12 @@ function txAll(){
   for(const o of L.outbox){ if(o.op==="add") m[o.id]=o.data; else if(o.op==="del") delete m[o.id]; }
   return Object.entries(m).map(([id,d])=>({id,...d})).sort((a,b)=>a.t-b.t);
 }
+/* The host's reset stamps each team; a team phone that sees a new stamp drops the cards it opened by code. */
+function checkReset(){
+  if(L.team===null) return;
+  const r=(srv.teams["t"+L.team]||{}).reset||0;
+  if(r!==(L.resetSeen||0)){ L.resetSeen=r; L.codeUnlocked=-1; L.seen=-1; }
+}
 function teamsAll(){
   const out=[0,1,2,3].map(t=>({name:`קבוצה ${t+1}`, progress:-1, ...(srv.teams["t"+t]||{})}));
   for(const o of L.outbox) if(o.op==="team") out[o.t]=Object.assign({},out[o.t],o.data);
@@ -342,7 +349,7 @@ function delTx(id){
 function setTeam(t, patch){
   const data=Object.assign({}, teamsAll()[t], patch);
   L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));
-  enqueue({op:"team", t, data:{name:data.name, progress:data.progress}});
+  enqueue({op:"team", t, data:{name:data.name, progress:data.progress, reset:data.reset||0}});
 }
 async function flush(){
   if(!db||flushing||writeDenied) return;
@@ -374,7 +381,7 @@ function subscribe(){
     srv.tx=Object.fromEntries(snap.docs.map(d=>[d.id,d.data()])); ok(snap); L.cacheTx=srv.tx; saveL(); render();
   }, ()=>{ srv.err=true; srv.live=false; clearTimeout(timer); render(); });
   db.collection("teams").onSnapshot(snap=>{
-    srv.teams=Object.fromEntries(snap.docs.map(d=>[d.id,d.data()])); ok(snap); L.cacheTeams=srv.teams; saveL(); render();
+    srv.teams=Object.fromEntries(snap.docs.map(d=>[d.id,d.data()])); ok(snap); L.cacheTeams=srv.teams; checkReset(); saveL(); render();
   }, ()=>{ srv.err=true; srv.live=false; clearTimeout(timer); render(); });
 }
 /* ---------- standalone website: Firebase Realtime Database over its REST + streaming API ---------- */
@@ -511,7 +518,7 @@ function bindTeam(){
       else{L.mode="host";L.preview=null;saveL();render();scrollTo(0,0);toast("נכנסת למסך המנחים");}}
     else{ui.hostErr="הקוד שגוי.";render();}};
   document.querySelectorAll(".pick button").forEach(b=>b.onclick=()=>{ui.pick=+b.dataset.t;render();});
-  const go=$("#go"); if(go) go.onclick=()=>{ if(ui.pick===null) return; L.team=ui.pick; L.codeUnlocked=-1; L.seen=teamsAll()[ui.pick].progress; saveL(); render(); scrollTo(0,0); };
+  const go=$("#go"); if(go) go.onclick=()=>{ if(ui.pick===null) return; L.team=ui.pick; L.codeUnlocked=-1; L.seen=teamsAll()[ui.pick].progress; L.resetSeen=teamsAll()[ui.pick].reset||0; saveL(); render(); scrollTo(0,0); };
   const sw=$("#sw"); if(sw) sw.onclick=()=>{ui.confirmSwitch=true;render();scrollTo({top:0,behavior:"smooth"});};
   const y=$("#swyes"); if(y) y.onclick=()=>{L.team=null;L.codeUnlocked=-1;L.seen=-1;ui.pick=null;ui.confirmSwitch=false;saveL();render();};
   const n=$("#swno"); if(n) n.onclick=()=>{ui.confirmSwitch=false;render();};
@@ -697,15 +704,15 @@ function bindHost(){
   all("[data-name]",inp=>inp.onchange=()=>{const t=+inp.dataset.name;const v=inp.value.trim()||`קבוצה ${t+1}`;if(v!==tname(t)) setTeam(t,{name:v});});
   const tc=$("#toctrl"); if(tc) tc.onclick=()=>{L.control=true;L.ctrlStep=0;saveL();render();scrollTo(0,0);};
   all("[data-prev]",b=>b.onclick=()=>{L.preview=+b.dataset.prev;saveL();render();scrollTo(0,0);});
-  const rs=$("#reset"); if(rs) rs.onclick=()=>{ui.confirmReset=true;render();};
+  const rs=$("#reset"); if(rs) rs.onclick=()=>{ if(db&&!srv.live){ toast("רגע, עדיין מתחבר לנתונים. נסו שוב בעוד כמה שניות."); return; } ui.confirmReset=true;render();};
   const rn=$("#resetno"); if(rn) rn.onclick=()=>{ui.confirmReset=false;render();};
   const ry=$("#resetyes"); if(ry) ry.onclick=()=>{
     ui.confirmReset=false;
     const ids=txAll().map(x=>x.id);
     L.outbox=L.outbox.filter(o=>o.op!=="add");
     ids.filter(id=>srv.tx[id]).forEach(id=>L.outbox.push({op:"del",id}));
-    [0,1,2,3].forEach(t=>{L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));L.outbox.push({op:"team",t,data:{name:tname(t),progress:-1}});});
-    saveL(); render(); flush(); toast("המירוץ אופס");
+    [0,1,2,3].forEach(t=>{L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));L.outbox.push({op:"team",t,data:{name:tname(t),progress:-1,reset:Date.now()}});});
+    L.codeUnlocked=-1; L.seen=-1; saveL(); render(); flush(); toast("המירוץ אופס");
   };
 }
 boot();

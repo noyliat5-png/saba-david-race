@@ -344,7 +344,7 @@ function subscribe(){
   }, ()=>{ srv.err=true; srv.live=false; clearTimeout(timer); render(); });
 }
 /* ---------- standalone website: Firebase Realtime Database over its REST + streaming API ---------- */
-const FB_URL = "";
+const FB_URL = "https://saba-race-default-rtdb.europe-west1.firebasedatabase.app https://saba-race-default-rtdb.firebaseio.com https://saba-race-default-rtdb.asia-southeast1.firebasedatabase.app";
 function fbDb(base){
   base=base.replace(/\/+$/,"")+"/race";
   const fail=()=>{ throw {code:"unavailable"}; };
@@ -375,7 +375,14 @@ function fbDb(base){
   return {collection:coll, doc:p=>docRef(p)};
 }
 async function boot(){
-  if(FB_URL){ db=fbDb(FB_URL); canWrite=true; render(); subscribe(); flush(); setInterval(()=>{ if(L.outbox.length) flush(); }, 15000); return; }
+  if(FB_URL){
+    /* FB_URL may list several candidate addresses separated by spaces: use the first that answers. */
+    const cands=FB_URL.split(/\s+/).filter(Boolean); let base=null;
+    try{ const known=localStorage.getItem("sabaRace_fb"); if(known&&cands.includes(known)) base=known; }catch(e){}
+    if(!base){ for(const u of cands){ try{ const r=await fetch(u.replace(/\/+$/,"")+"/race.json?shallow=true"); if(r.ok){ base=u; break; } }catch(e){} } }
+    if(!base) base=cands[0];
+    try{ localStorage.setItem("sabaRace_fb",base); }catch(e){}
+    db=fbDb(base); canWrite=true; render(); subscribe(); flush(); setInterval(()=>{ if(L.outbox.length) flush(); }, 15000); return; }
   render();
   const c=window.claude;
   if(!c||!c.use){ localTest=true; if(location.hash==="#host-local"){ canEdit=true; render(); } return; }

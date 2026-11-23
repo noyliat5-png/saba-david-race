@@ -280,8 +280,11 @@ function keepUI(app, fn){
 }
 
 const START = 300;
-const VERSION = "1.2";
+const VERSION = "1.3";
 const CHANGES = {
+  "1.3": ["קבוצת בקרה למנחים: בוחרים ״קבוצת בקרה״, מקלידים 0412, ועוברים על כל הכרטיסיות, התמונות והעיצובים בדיוק כמו שהקבוצות רואות.",
+          "קבוצת הבקרה לא משנה כלום במירוץ: לא כסף, לא כרטיסיות של קבוצות אחרות.",
+          "כל ארבעת חברי הקבוצה יכולים להיכנס מטלפונים שונים. כרטיסייה שנפתחת בקוד בטלפון אחד נפתחת אצל כל הקבוצה."],
   "1.2": ["הלוגו ותמונת ״אני אוהב את סבא דוד״ חזרו לצבעים המקוריים.",
           "חזרו צבעי ההזמנה: אדום למשימות, כחול לרמזים, וקונפטי צבעוני."],
   "1.1": ["עיצוב חדש בהשראת ההזמנה: פונטים, מסגרות, קונפטי וקו דגל משובץ.",
@@ -289,7 +292,7 @@ const CHANGES = {
 };
 const LS = store("sabaRace_v2");
 const HAD_STATE = !!LS.get();
-let L = Object.assign({team:null, codeUnlocked:-1, tab:"bank", sel:0, station:1, guide:0, outbox:[], cacheTx:{}, cacheTeams:{}, preview:null, seen:-1, mode:"auto"}, LS.get()||{});
+let L = Object.assign({team:null, codeUnlocked:-1, tab:"bank", sel:0, station:1, guide:0, outbox:[], cacheTx:{}, cacheTeams:{}, preview:null, seen:-1, mode:"auto", control:false, ctrlStep:0}, LS.get()||{});
 function saveL(){LS.set(L);}
 const srv = {tx:L.cacheTx||{}, teams:L.cacheTeams||{}, live:false, stale:false, err:false};
 let db=null, canEdit=false, canWrite=null, localTest=false, writeDenied=false, flushing=false, retryTimer=null;
@@ -434,8 +437,8 @@ function statusHTML(){
   if(srv.live && !pend) return `<span class="live"><i></i>מחובר</span>`;
   return `<span class="live off"><i></i>${pend?`${pend} ממתינים לקליטה`:"אין קליטה"}</span>`;
 }
-function render(){ keepUI($("#app"), ()=>{ $("#app").innerHTML = ((isHost() && L.preview===null) ? hostHTML() : teamHTML()) + `<p class="version">המירוץ של סבא דוד · גרסה ${VERSION}</p>` + newsHTML(); });
-  const nok=$("#newsok"); if(nok) nok.onclick=()=>{ui.news=false;render();}; isHost()&&L.preview===null ? bindHost() : bindTeam();
+function render(){ keepUI($("#app"), ()=>{ $("#app").innerHTML = (L.control ? controlHTML() : (isHost() && L.preview===null) ? hostHTML() : teamHTML()) + `<p class="version">המירוץ של סבא דוד · גרסה ${VERSION}</p>` + newsHTML(); });
+  const nok=$("#newsok"); if(nok) nok.onclick=()=>{ui.news=false;render();}; L.control ? bindControl() : (isHost()&&L.preview===null ? bindHost() : bindTeam());
   if(ui.scrollTo){ const el=document.getElementById(ui.scrollTo); ui.scrollTo=null; if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); } }
 
 /* =================== TEAM VIEW =================== */
@@ -470,27 +473,31 @@ function teamHTML(){
     const rest=steps.slice(u+2);
     if(rest.length) h+=`<div class="ahead" aria-label="בהמשך">${rest.map(s=>`<span>${esc(s.label)}</span>`).join("")}</div>`;
   }
-  if(L.preview===null) h+=`<div class="row"><button class="btn ghost" id="sw">החלפת קבוצה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>`+hostWinHTML();
+  if(L.preview===null) h+=`<div class="row"><button class="btn ghost" id="sw">החלפת קבוצה</button><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>`+hostWinHTML();
   return h;
 }
 function pickHTML(){
   return `${heroHTML("המירוץ של סבא דוד","✦ מירוץ משפחתי לכבוד יום הולדת 80 ✦")}
-    <div class="card"><h2>באיזו קבוצה אתם?</h2><p class="muted">טלפון אחד לכל קבוצה מספיק.</p>
+    <div class="card"><h2>באיזו קבוצה אתם?</h2><p class="muted">כל חברי הקבוצה יכולים להיכנס, כל אחד מהטלפון שלו: פשוט בוחרים את אותה קבוצה. היתרה והכרטיסיות יהיו זהות בכל הטלפונים.</p>
     <div class="pick">${[0,1,2,3].map(i=>`<button type="button" data-t="${i}" aria-pressed="${ui.pick===i}"><span class="sw" style="background:${TEAM_VAR(i)}"></span><b>${esc(tname(i))}</b></button>`).join("")}</div>
     <button class="btn" id="go"${ui.pick===null?" disabled":""}>מתחילים</button></div>
-    <button class="btn ghost" id="hostin">כניסת מנחים</button>${hostWinHTML()}`;
+    <div class="row"><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>${hostWinHTML()}`;
 }
 function hostWinHTML(){
   if(!ui.hostWin) return "";
-  return `<div class="card" id="hostwin"><h3>כניסת מנחים</h3><p class="muted small">למנחים בלבד. משתתפים שהגיעו לכאן בטעות יכולים ללחוץ ״חזרה״.</p>
+  const ctrl=ui.hostWin==="ctrl";
+  return `<div class="card" id="hostwin"><h3>${ctrl?"קבוצת בקרה":"כניסת מנחים"}</h3><p class="muted small">למנחים בלבד. משתתפים שהגיעו לכאן בטעות יכולים ללחוץ ״חזרה״.</p>
     <form class="codein" id="hostform" autocomplete="off"><input id="hcode" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" aria-label="קוד מנחים"><button class="btn" type="submit">כניסה</button></form>
     ${ui.hostErr?`<p class="err" role="alert">${esc(ui.hostErr)}</p>`:""}<button class="btn alt" id="hostcancel">חזרה</button></div>`;
 }
 function bindTeam(){
+  const ci=$("#ctrlin"); if(ci) ci.onclick=()=>{ui.hostWin="ctrl";ui.hostErr="";render();const w=$("#hostwin");if(w){w.scrollIntoView({behavior:"smooth",block:"center"});$("#hcode").focus({preventScroll:true});}};
   const hi=$("#hostin"); if(hi) hi.onclick=()=>{ui.hostWin=true;ui.hostErr="";render();const w=$("#hostwin");if(w){w.scrollIntoView({behavior:"smooth",block:"center"});$("#hcode").focus({preventScroll:true});}};
   const hc=$("#hostcancel"); if(hc) hc.onclick=()=>{ui.hostWin=false;ui.hostErr="";render();};
   const hf=$("#hostform"); if(hf) hf.onsubmit=e=>{e.preventDefault();const v=$("#hcode").value.trim();$("#hcode").value="";
-    if(v===HOST_CODE){ui.hostWin=false;ui.hostErr="";L.mode="host";L.preview=null;saveL();render();scrollTo(0,0);toast("נכנסת למסך המנחים");}
+    if(v===HOST_CODE){const ctrl=ui.hostWin==="ctrl";ui.hostWin=false;ui.hostErr="";
+      if(ctrl){L.control=true;L.ctrlStep=0;saveL();render();scrollTo(0,0);toast("נכנסת לקבוצת הבקרה");}
+      else{L.mode="host";L.preview=null;saveL();render();scrollTo(0,0);toast("נכנסת למסך המנחים");}}
     else{ui.hostErr="הקוד שגוי.";render();}};
   document.querySelectorAll(".pick button").forEach(b=>b.onclick=()=>{ui.pick=+b.dataset.t;render();});
   const go=$("#go"); if(go) go.onclick=()=>{ if(ui.pick===null) return; L.team=ui.pick; L.codeUnlocked=-1; L.seen=teamsAll()[ui.pick].progress; saveL(); render(); scrollTo(0,0); };
@@ -506,11 +513,46 @@ function tryCode(code){
   const k=DATA.codes[t].lastIndexOf(code);
   if(k<0){ ui.err="הקוד לא מתאים לקבוצה שלכם. בדקו את המספר מול המנחה."; render(); shakeLock(); return; }
   ui.err="";
-  if(k>unlockedFor(t)){ L.codeUnlocked=Math.max(L.codeUnlocked,k); saveL(); }
+  if(k>unlockedFor(t)){ L.codeUnlocked=Math.max(L.codeUnlocked,k); saveL();
+    /* Share the unlock with teammates' phones when this phone may write. */
+    if(db && canWrite===true && k>teamsAll()[t].progress) setTeam(t,{progress:k}); }
   else toast("הכרטיסייה הזאת כבר פתוחה");
   render();
 }
 function shakeLock(){const l=$("#lockcard");if(l){l.classList.remove("shake");void l.offsetWidth;l.classList.add("shake");}}
+
+/* =================== CONTROL GROUP: host preview of every stage, local only =================== */
+function controlHTML(){
+  const steps=DATA.steps, u=Math.min(Math.max(L.ctrlStep,-1),steps.length-1), next=steps[u+1], txs=txAll();
+  let h=`<header class="bar"><div class="who"><span class="dot" style="background:var(--ink);box-shadow:0 0 0 2px #fff"></span><span class="name">קבוצת בקרה</span></div>
+    <button class="barbtn" id="ctrlexit">יציאה</button></header>`;
+  h+=`<div class="warn"><b>מצב בקרה.</b> כאן רואים בדיוק מה שהקבוצות רואות. שום דבר כאן לא משנה את המירוץ.</div>`;
+  h+=`<div class="card" id="ctrlbar"><div class="secthead"><h3>שלב ${u+1} מתוך ${steps.length}</h3><span class="muted small">${u<0?"עוד לא נפתחה כרטיסייה":esc(steps[u].label)}</span></div>
+    <div class="row"><button class="btn alt" id="cprev"${u<0?" disabled":""}>הקודם</button><button class="btn" id="cnext"${u>=steps.length-1?" disabled":""}>הבא</button></div>
+    <div class="seg">${steps.map((s,i)=>`<button data-cjump="${i}" aria-pressed="${i===u}" title="${esc(s.label)}">${i+1}</button>`).join("")}</div>
+    <div class="row"><button class="btn ghost" id="call">פתיחת הכול</button><button class="btn ghost" id="cnews">הצגת הודעת שדרוג</button></div></div>`;
+  h+=heroHTML("המירוץ של סבא דוד","✦ מירוץ משפחתי לכבוד יום הולדת 80 ✦");
+  if(db||localTest){ const order=[0,1,2,3].map(x=>({x,b:balOf(x,txs)})).sort((a,b)=>b.b-a.b);
+    h+=`<ul class="mini" aria-label="היתרות של כל הקבוצות">${order.map(o=>`<li style="--c:${TEAM_VAR(o.x)}"><span>${esc(tname(o.x))}</span><b>${shekel(o.b)}</b></li>`).join("")}</ul>`; }
+  h+=briefingHTML(u<0);
+  h+=`<div class="sect"><h2>הכרטיסיות שלכם</h2><span class="muted small mono">${Math.max(0,u+1)}/${steps.length}</span></div>`;
+  for(let i=0;i<=u;i++) h+=stepCardHTML(steps[i],"בקרה");
+  if(next){
+    h+=`<div class="lock ${next.kind}"><div class="lk"><span class="tag">${esc(next.label)}</span><span class="pill">נעול</span></div>
+      <p class="muted">כך נראית כרטיסייה נעולה אצל הקבוצות. לחצו ״הבא״ כדי לפתוח אותה.</p></div>`;
+    const rest=steps.slice(u+2); if(rest.length) h+=`<div class="ahead">${rest.map(s=>`<span>${esc(s.label)}</span>`).join("")}</div>`;
+  }
+  return h;
+}
+function bindControl(){
+  const go=i=>{L.ctrlStep=i;saveL();render();const id=i>=0?"card-"+DATA.steps[i].id:"ctrlbar";const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});};
+  $("#ctrlexit").onclick=()=>{L.control=false;saveL();render();scrollTo(0,0);};
+  $("#cprev").onclick=()=>go(L.ctrlStep-1);
+  $("#cnext").onclick=()=>go(L.ctrlStep+1);
+  $("#call").onclick=()=>{L.ctrlStep=DATA.steps.length-1;saveL();render();};
+  $("#cnews").onclick=()=>{ui.news=true;ui.prevVer=null;render();};
+  document.querySelectorAll("[data-cjump]").forEach(b=>b.onclick=()=>go(+b.dataset.cjump));
+}
 
 /* =================== HOST VIEW =================== */
 const GENERAL = [
@@ -618,6 +660,7 @@ function boardHTML(txs){
 }
 function setHTML(){
   return `<div class="card"><h2>שמות הקבוצות</h2><p class="muted small">השמות מופיעים גם בטלפונים של הקבוצות.</p>${[0,1,2,3].map(t=>`<label for="nm${t}"><span style="color:${TEAM_VAR(t)}">קבוצה ${t+1}</span><input id="nm${t}" type="text" maxlength="24" value="${esc(tname(t))}" data-name="${t}"></label>`).join("")}</div>
+  <div class="card"><h2>קבוצת בקרה</h2><p class="muted">מעבר על כל הכרטיסיות, התמונות והעיצובים כמו שהקבוצות רואות, בלי לשנות כלום במירוץ.</p><button class="btn" id="toctrl">פתיחת קבוצת הבקרה</button></div>
   <div class="card"><h2>מה הקבוצות רואות</h2><p class="muted">תצוגה מקדימה של מסך הקבוצה, בלי לשנות כלום.</p><div class="row">${[0,1,2,3].map(t=>`<button class="btn alt" data-prev="${t}">${esc(tname(t))}</button>`).join("")}</div></div>
   <div class="card"><h2>איפוס המירוץ</h2><p class="muted">מוחק את כל הרישומים ומחזיר את כל הכרטיסיות למצב נעול, אצל כולם. שמות הקבוצות נשמרים.</p>
    ${ui.confirmReset?`<div class="row"><button class="btn bad" id="resetyes">כן, למחוק הכול</button><button class="btn alt" id="resetno">ביטול</button></div>`:`<button class="btn ghost" id="reset">איפוס</button>`}</div>`;
@@ -641,6 +684,7 @@ function bindHost(){
   all("[data-give]",b=>b.onclick=()=>{const t=+b.dataset.give,p=teamsAll()[t].progress;if(p<DATA.steps.length-1){setTeam(t,{progress:p+1});toast(`${tname(t)}: ${DATA.steps[p+1].label} נפתחה`);}});
   all("[data-back]",b=>b.onclick=()=>{const t=+b.dataset.back,p=teamsAll()[t].progress;if(p>=0) setTeam(t,{progress:p-1});});
   all("[data-name]",inp=>inp.onchange=()=>{const t=+inp.dataset.name;const v=inp.value.trim()||`קבוצה ${t+1}`;if(v!==tname(t)) setTeam(t,{name:v});});
+  const tc=$("#toctrl"); if(tc) tc.onclick=()=>{L.control=true;L.ctrlStep=0;saveL();render();scrollTo(0,0);};
   all("[data-prev]",b=>b.onclick=()=>{L.preview=+b.dataset.prev;saveL();render();scrollTo(0,0);});
   const rs=$("#reset"); if(rs) rs.onclick=()=>{ui.confirmReset=true;render();};
   const rn=$("#resetno"); if(rn) rn.onclick=()=>{ui.confirmReset=false;render();};

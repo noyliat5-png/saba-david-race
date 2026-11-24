@@ -173,6 +173,16 @@ details.fold.bonus>summary{color:var(--blue)}
 #bform input{letter-spacing:normal;text-align:start;font-family:var(--body);font-size:1rem}
 .bar .meName{font-size:.9rem;opacity:.85;white-space:nowrap}
 .pick.who b{font-family:var(--display);font-size:1.25rem}
+/* group 6: Saba & Savta */
+.gteams{display:grid;gap:10px}
+.gteam{background:var(--surface);border:2.5px solid var(--line);border-inline-start:10px solid var(--c);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.gteam .gtop{display:flex;align-items:center;gap:10px}
+.gteam .rank{width:28px;height:28px;border-radius:50%;background:var(--c);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.gteam .nm{font-family:var(--display);font-size:1.2rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gteam .bal{font-size:1.1rem}
+.gteam .meter{height:8px;background:var(--hair);border-radius:999px;overflow:hidden}
+.gteam .meter i{display:block;height:100%;background:var(--c)}
+#ghints .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 
 .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:4}
 .tabs button{border:0;background:transparent;border-radius:9px;padding:8px 2px;font-size:.88rem;font-weight:600;color:var(--muted);min-height:42px}
@@ -308,8 +318,9 @@ function keepUI(app, fn){
 }
 
 const START = 300;
-const VERSION = "2.1";
+const VERSION = "2.2";
 const CHANGES = {
+  "2.2": ["חדש: קבוצה 6 של סבא וסבתא. רואים בזמן אמת את המצב של כל הקבוצות, את הרמזים שאפשר לתת בכל תחנה, ואפשר לענות על החידון בלי ניקוד."],
   "2.1": ["חידון הבונוס: תיקוני תשובות לפי ליאת, ובשאלה האחרונה נוספה התשובה ״כל התשובות נכונות״."],
   "2.0": ["חידון הבונוס גדל: שאלות על כל מה שסבא סיפר, ושאלה אחרונה שבה כל התשובות נכונות.","כל תשובה נכונה שווה עכשיו 5 ₪."],
   "1.9": ["חידון הבונוס הוחלף בשאלות אישיות על סבא: איפה נולד, איפה למד, החברה הראשונה, איפה הכיר את סבתא ועוד."],
@@ -376,16 +387,16 @@ function answerBonus(qid,k){
   toast(ok?`נכון! +${BONUS_PTS} ₪ לקבוצה`:"לא נכון הפעם");
 }
 function bonusHTML(practice){
-  const qs=DATA.bonus, t=practice?null:L.team, me=practice?(L.ctrlMe||""):normName(L.me), b=practice?{}:bonusAll();
+  const qs=DATA.bonus, t=practice?null:L.team, me=practice?(L.grand?"סבא וסבתא":(L.ctrlMe||"")):normName(L.me), b=practice?{}:bonusAll();
   const mine=qid=>practice?ui.cbonus[qid]:b[bKey(t,me,qid)];
   const done=qs.filter(q=>mine(q.id)).length, right=qs.filter(q=>{const a=mine(q.id);return a&&a.ok;}).length;
   const teamEarned=practice?0:Object.values(b).filter(x=>x.team===t&&x.ok).length*BONUS_PTS;
   let h=`<details class="fold bonus" id="d-bonus"><summary>חידון בונוס · ${BONUS_PTS} ₪ לכל תשובה נכונה</summary><div class="in">
     <p>כל אחד מחברי הקבוצה עונה מהטלפון שלו, פעם אחת על כל שאלה. כל תשובה נכונה מכניסה ${BONUS_PTS} ₪ לקופה של הקבוצה. אפשר לענות מתי שרוצים, לאורך כל המירוץ.</p>`;
-  if(practice) h+=`<p class="muted small">במצב בקרה התשובות לא נשמרות ולא מוסיפות כסף.</p>`;
+  if(practice) h+=`<p class="muted small">${L.grand?"כאן עונים בשביל הכיף: התשובות לא נשמרות ולא מוסיפות כסף לאף קבוצה.":"במצב בקרה התשובות לא נשמרות ולא מוסיפות כסף."}</p>`;
   else if(!db) return h+`<p class="warn">החידון עובד כשיש חיבור לנתונים.</p></div></details>`;
   else h+=`<p class="pill-blue" style="align-self:flex-start">הקבוצה הרוויחה מהחידון: ${shekel(teamEarned)}</p>`;
-  h+=`<div class="secthead"><span>עונה: <b>${esc(me)}</b></span><button class="undo" id="bnot">לא אני</button></div>`;
+  h+=`<div class="secthead"><span>עונה: <b>${esc(me)}</b></span>${L.grand?"":`<button class="undo" id="bnot">לא אני</button>`}</div>`;
   h+=`<p class="muted small mono">ענית על ${done} מתוך ${qs.length} · ${right} נכונות</p>`;
   if(ui.berr) h+=`<p class="err" role="alert">${esc(ui.berr)}</p>`;
   const letters=["א","ב","ג","ד","ה"];
@@ -550,8 +561,8 @@ function statusHTML(){
   if(srv.live && !pend) return `<span class="live"><i></i>מחובר</span>`;
   return `<span class="live off"><i></i>${pend?`${pend} ממתינים לקליטה`:"אין קליטה"}</span>`;
 }
-function render(){ keepUI($("#app"), ()=>{ $("#app").innerHTML = (L.control ? controlHTML() : (isHost() && L.preview===null) ? hostHTML() : teamHTML()) + `<p class="version">המירוץ של סבא דוד · גרסה ${VERSION}</p>` + newsHTML(); });
-  const nok=$("#newsok"); if(nok) nok.onclick=()=>{ui.news=false;render();}; L.control ? bindControl() : (isHost()&&L.preview===null ? bindHost() : bindTeam());
+function render(){ keepUI($("#app"), ()=>{ $("#app").innerHTML = (L.control ? controlHTML() : L.grand ? grandHTML() : (isHost() && L.preview===null) ? hostHTML() : teamHTML()) + `<p class="version">המירוץ של סבא דוד · גרסה ${VERSION}</p>` + newsHTML(); });
+  const nok=$("#newsok"); if(nok) nok.onclick=()=>{ui.news=false;render();}; L.control ? bindControl() : L.grand ? bindGrand() : (isHost()&&L.preview===null ? bindHost() : bindTeam());
   if(ui.scrollTo){ const el=document.getElementById(ui.scrollTo); ui.scrollTo=null; if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); } }
 
 /* =================== TEAM VIEW =================== */
@@ -588,7 +599,7 @@ function teamHTML(){
     const rest=steps.slice(u+2);
     if(rest.length) h+=`<div class="ahead" aria-label="בהמשך">${rest.map(s=>`<span>${esc(s.label)}</span>`).join("")}</div>`;
   }
-  if(L.preview===null) h+=`<div class="row"><button class="btn ghost" id="sw">החלפת קבוצה</button><button class="btn ghost" id="chname">החלפת שם</button><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>`+hostWinHTML();
+  if(L.preview===null) h+=`<div class="row"><button class="btn ghost" id="sw">החלפת קבוצה</button><button class="btn ghost" id="chname">החלפת שם</button><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="grandin">קבוצה 6 · סבא וסבתא</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>`+hostWinHTML();
   return h;
 }
 function pickHTML(){
@@ -596,22 +607,24 @@ function pickHTML(){
     <div class="card"><h2>באיזו קבוצה אתם?</h2><p class="muted">כל חברי הקבוצה יכולים להיכנס, כל אחד מהטלפון שלו: פשוט בוחרים את אותה קבוצה. היתרה והכרטיסיות יהיו זהות בכל הטלפונים.</p>
     <div class="pick">${[0,1,2,3].map(i=>`<button type="button" data-t="${i}" aria-pressed="${ui.pick===i}"><span class="sw" style="background:${TEAM_VAR(i)}"></span><b>${esc(tname(i))}</b></button>`).join("")}</div>
     <button class="btn" id="go"${ui.pick===null?" disabled":""}>מתחילים</button></div>
-    <div class="row"><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>${hostWinHTML()}`;
+    <div class="row"><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="grandin">קבוצה 6 · סבא וסבתא</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>${hostWinHTML()}`;
 }
 function hostWinHTML(){
   if(!ui.hostWin) return "";
-  const ctrl=ui.hostWin==="ctrl";
-  return `<div class="card" id="hostwin"><h3>${ctrl?"קבוצת בקרה":"כניסת מנחים"}</h3><p class="muted small">למנחים בלבד. משתתפים שהגיעו לכאן בטעות יכולים ללחוץ ״חזרה״.</p>
+  const ctrl=ui.hostWin==="ctrl", grand=ui.hostWin==="grand";
+  return `<div class="card" id="hostwin"><h3>${ctrl?"קבוצת בקרה":grand?"קבוצה 6 · סבא וסבתא":"כניסת מנחים"}</h3>${grand?`<p class="muted small">המסך של סבא וסבתא. המנחים מקלידים את הקוד פעם אחת בטלפון של סבא וסבתא.</p>`:""}<p class="muted small">למנחים בלבד. משתתפים שהגיעו לכאן בטעות יכולים ללחוץ ״חזרה״.</p>
     <form class="codein" id="hostform" autocomplete="off"><input id="hcode" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="····" aria-label="קוד מנחים"><button class="btn" type="submit">כניסה</button></form>
     ${ui.hostErr?`<p class="err" role="alert">${esc(ui.hostErr)}</p>`:""}<button class="btn alt" id="hostcancel">חזרה</button></div>`;
 }
 function bindTeam(){
   const ci=$("#ctrlin"); if(ci) ci.onclick=()=>{ui.hostWin="ctrl";ui.hostErr="";render();const w=$("#hostwin");if(w){w.scrollIntoView({behavior:"smooth",block:"center"});$("#hcode").focus({preventScroll:true});}};
+  const gi=$("#grandin"); if(gi) gi.onclick=()=>{ui.hostWin="grand";ui.hostErr="";render();const w=$("#hostwin");if(w){w.scrollIntoView({behavior:"smooth",block:"center"});$("#hcode").focus({preventScroll:true});}};
   const hi=$("#hostin"); if(hi) hi.onclick=()=>{ui.hostWin=true;ui.hostErr="";render();const w=$("#hostwin");if(w){w.scrollIntoView({behavior:"smooth",block:"center"});$("#hcode").focus({preventScroll:true});}};
   const hc=$("#hostcancel"); if(hc) hc.onclick=()=>{ui.hostWin=false;ui.hostErr="";render();};
   const hf=$("#hostform"); if(hf) hf.onsubmit=e=>{e.preventDefault();const v=$("#hcode").value.trim();$("#hcode").value="";
-    if(v===HOST_CODE){const ctrl=ui.hostWin==="ctrl";ui.hostWin=false;ui.hostErr="";
-      if(ctrl){L.control=true;L.ctrlStep=0;saveL();render();scrollTo(0,0);toast("נכנסת לקבוצת הבקרה");}
+    if(v===HOST_CODE){const ctrl=ui.hostWin==="ctrl", grand=ui.hostWin==="grand";ui.hostWin=false;ui.hostErr="";
+      if(grand){L.grand=true;L.grandSt=L.grandSt||1;saveL();render();scrollTo(0,0);toast("ברוכים הבאים, סבא וסבתא!");}
+      else if(ctrl){L.control=true;L.ctrlStep=0;saveL();render();scrollTo(0,0);toast("נכנסת לקבוצת הבקרה");}
       else{L.mode="host";L.preview=null;saveL();render();scrollTo(0,0);toast("נכנסת למסך המנחים");}}
     else{ui.hostErr="הקוד שגוי.";render();}};
   document.querySelectorAll(".pick button").forEach(b=>b.onclick=()=>{ui.pick=+b.dataset.t;render();});
@@ -638,6 +651,41 @@ function tryCode(code){
   render();
 }
 function shakeLock(){const l=$("#lockcard");if(l){l.classList.remove("shake");void l.offsetWidth;l.classList.add("shake");}}
+
+/* =================== GROUP 6: SABA & SAVTA. Read-only live view, hints per station, quiz without scoring =================== */
+function grandHTML(){
+  const steps=DATA.steps, txs=txAll(), tm=teamsAll(), b=bonusAll();
+  let h=`<header class="bar"><div class="who"><span class="dot" style="background:var(--gold);box-shadow:0 0 0 2px #fff"></span><span class="name">קבוצה 6 · סבא וסבתא</span></div>
+    <div class="mybal">${statusHTML()}</div><button class="barbtn" id="grandexit">יציאה</button></header>`;
+  h+=heroHTML("המירוץ של סבא דוד","✦ המסך של סבא וסבתא ✦");
+  h+=`<div class="warn">כאן רואים מה קורה אצל כל הקבוצות. שום דבר במסך הזה לא משנה כסף או כרטיסיות.</div>`;
+  if(!db) h+=`<div class="warn">אין חיבור לנתונים, ולכן המצב של הקבוצות לא מתעדכן כאן.</div>`;
+  else if((srv.stale||srv.err)&&!srv.live) h+=`<div class="warn">אין קליטה כרגע. מוצג המצב האחרון שהתקבל.</div>`;
+  const order=[0,1,2,3].map(t=>({t,bal:balOf(t,txs)})).sort((x,y)=>y.bal-x.bal);
+  h+=`<div class="sect"><h2>מה קורה עכשיו</h2></div><div class="gteams">${order.map((o,r)=>{const t=o.t,u=tm[t].progress,cur=u>=0?steps[u]:null,nx=steps[u+1];
+    const quiz=Object.values(b).filter(x=>x.team===t&&x.ok).length*BONUS_PTS;
+    const last=txs.filter(x=>x.team===t).slice(-1)[0];
+    return `<article class="gteam" id="gt-${t}" style="--c:${TEAM_VAR(t)}"><div class="gtop"><span class="rank">${r+1}</span><b class="nm">${esc(tname(t))}</b><b class="bal mono">${shekel(o.bal)}</b></div>
+      <p><span class="muted">תחנה:</span> ${cur?`${cur.station} מתוך 4`:"עוד לא התחילו"}</p>
+      <p><span class="muted">כרטיסייה אחרונה שנפתחה:</span> ${cur?esc(cur.label):"—"}${nx?` · <span class="muted">הבאה:</span> ${esc(nx.label)}`:" · סיימו!"}</p>
+      <div class="meter" aria-hidden="true"><i style="width:${Math.max(0,u+1)/steps.length*100}%"></i></div>
+      <p class="small"><span class="muted">מהחידון:</span> ${shekel(quiz)}${last?` · <span class="muted">רישום אחרון:</span> ${esc(last.label)} (${signed(last.amount)})`:""}</p></article>`;}).join("")}</div>`;
+  const st=L.grandSt||1, S=DATA.stations[st-1], clue=S.clue?steps.find(x=>x.id===S.clue):null;
+  h+=`<div class="sect"><h2>רמזים שאפשר לתת</h2></div><div class="card" id="ghints"><div class="seg">${[1,2,3,4].map(n=>`<button data-gst="${n}" aria-pressed="${st===n}">תחנה ${n}</button>`).join("")}</div>
+    <p class="muted small">שמות התחנות לא מוצגים כאן, כי הם הפתרונות של הרמזים.</p>`;
+  if(!clue) h+=`<p>בתחנה הזאת אין רמז לתחנה הבאה. זו תחנת הסיום.</p>`;
+  else if(!S.hints.length) h+=`<p>ל${esc(clue.label)} אין רמז נוסף בחומרי המירוץ.</p>`;
+  else h+=`<p>אם קבוצה נתקעת ב${esc(clue.label)}, אפשר לתת לה:</p>${S.hints.map((x,i)=>`<div class="hint"><span class="c">${i===0?"רמז ראשון":"רמז שני"}</span><span>${esc(x)}</span></div>`).join("")}
+    <p class="muted small">לפי חוקי המירוץ, רמז מהמנחה עולה 30 ש״ח (ראשון) או 60 ש״ח (שני).</p>`;
+  h+=`</div>`;
+  h+=bonusHTML(true);
+  return h;
+}
+function bindGrand(){
+  $("#grandexit").onclick=()=>{L.grand=false;ui.cbonus={};ui.bsel={};saveL();render();scrollTo(0,0);};
+  document.querySelectorAll("[data-gst]").forEach(b=>b.onclick=()=>{L.grandSt=+b.dataset.gst;saveL();render();});
+  bindBonus(true);
+}
 
 /* =================== CONTROL GROUP: host preview of every stage, local only =================== */
 function controlHTML(){
@@ -788,6 +836,7 @@ function boardHTML(txs){
 function setHTML(){
   return `<div class="card"><h2>שמות הקבוצות</h2><p class="muted small">השמות מופיעים גם בטלפונים של הקבוצות.</p>${[0,1,2,3].map(t=>`<label for="nm${t}"><span style="color:${TEAM_VAR(t)}">קבוצה ${t+1}</span><input id="nm${t}" type="text" maxlength="24" value="${esc(tname(t))}" data-name="${t}"></label>`).join("")}</div>
   <div class="card"><h2>קבוצת בקרה</h2><p class="muted">מעבר על כל הכרטיסיות, התמונות והעיצובים כמו שהקבוצות רואות, בלי לשנות כלום במירוץ.</p><button class="btn" id="toctrl">פתיחת קבוצת הבקרה</button></div>
+  <div class="card"><h2>קבוצה 6 · סבא וסבתא</h2><p class="muted">המצב של כל הקבוצות בזמן אמת, הרמזים שאפשר לתת בכל תחנה, וחידון בלי ניקוד. לא משנה כלום במירוץ.</p><button class="btn" id="togrand">פתיחת המסך של סבא וסבתא</button></div>
   <div class="card"><h2>מה הקבוצות רואות</h2><p class="muted">תצוגה מקדימה של מסך הקבוצה, בלי לשנות כלום.</p><div class="row">${[0,1,2,3].map(t=>`<button class="btn alt" data-prev="${t}">${esc(tname(t))}</button>`).join("")}</div></div>
   <div class="card"><h2>איפוס המירוץ</h2><p class="muted">מוחק את כל הרישומים ומחזיר את כל הכרטיסיות למצב נעול, אצל כולם. שמות הקבוצות נשמרים.</p>
    ${ui.confirmReset?`<div class="row"><button class="btn bad" id="resetyes">כן, למחוק הכול</button><button class="btn alt" id="resetno">ביטול</button></div>`:`<button class="btn ghost" id="reset">איפוס</button>`}</div>`;
@@ -811,6 +860,7 @@ function bindHost(){
   all("[data-give]",b=>b.onclick=()=>{const t=+b.dataset.give,p=teamsAll()[t].progress;if(p<DATA.steps.length-1){setTeam(t,{progress:p+1});toast(`${tname(t)}: ${DATA.steps[p+1].label} נפתחה`);}});
   all("[data-back]",b=>b.onclick=()=>{const t=+b.dataset.back,p=teamsAll()[t].progress;if(p>=0) setTeam(t,{progress:p-1});});
   all("[data-name]",inp=>inp.onchange=()=>{const t=+inp.dataset.name;const v=inp.value.trim()||`קבוצה ${t+1}`;if(v!==tname(t)) setTeam(t,{name:v});});
+  const tg=$("#togrand"); if(tg) tg.onclick=()=>{L.grand=true;L.grandSt=L.grandSt||1;saveL();render();scrollTo(0,0);};
   const tc=$("#toctrl"); if(tc) tc.onclick=()=>{L.control=true;L.ctrlStep=0;saveL();render();scrollTo(0,0);};
   all("[data-prev]",b=>b.onclick=()=>{L.preview=+b.dataset.prev;saveL();render();scrollTo(0,0);});
   const rs=$("#reset"); if(rs) rs.onclick=()=>{ if(db&&!srv.live){ toast("רגע, עדיין מתחבר לנתונים. נסו שוב בעוד כמה שניות."); return; } ui.confirmReset=true;render();};

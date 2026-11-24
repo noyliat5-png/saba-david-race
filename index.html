@@ -1,12 +1,12 @@
 <!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style></head><body><title>המירוץ של סבא דוד</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=IBM+Plex+Mono:wght@500;600&family=Rubik:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=IBM+Plex+Mono:wght@500;600&family=Rubik:wght@400;500;700&family=Varela+Round&display=swap">
 <style>
 /* Layout: one-column phone app. Navy sticky bar, then cards that mirror the printed ones: red = task, gold = clue. */
 :root{
   /* Invitation look: white paper, heavy black serif, blue + purple only, confetti, checkered race line. Single light theme on purpose. */
-  --bg:#ffffff; --surface:#ffffff; --paper:#f7f8fc;
+  --bg:#e6f3fc; --surface:#ffffff; --paper:#f4f9fe;
   --ink:#111111; --muted:#55596a; --line:#1a1a1a; --hair:#dfe2ec;
   --blue:#1e6fd0; --blue-soft:#eaf2fd; --red:#e53935; --red-soft:#fdecec; --gold:#b8860b; --gold-soft:#fff6d6;
   --task:var(--red); --task-soft:var(--red-soft); --clue:var(--blue); --clue-soft:var(--blue-soft);
@@ -15,7 +15,7 @@
   --bar:#111111; --bar-ink:#ffffff; --plate:#ffffff;
   --t0:#1e6fd0; --t1:#e53935; --t2:#2e7d32; --t3:#8e44ad;
   --display:"Frank Ruhl Libre","David Libre",Georgia,serif;
-  --body:"Rubik","Heebo",Arial,sans-serif;
+  --body:"Varela Round","Rubik","Heebo",Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   color-scheme:light;
 }
@@ -183,6 +183,22 @@ details.fold.bonus>summary{color:var(--blue)}
 .gteam .meter{height:8px;background:var(--hair);border-radius:999px;overflow:hidden}
 .gteam .meter i{display:block;height:100%;background:var(--c)}
 #ghints .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+/* v2.3: quiz stands out */
+details.fold.bonus{border-color:var(--blue)!important;box-shadow:0 6px 0 var(--blue)}
+details.fold.bonus>summary{background:var(--blue);color:#fff;border-radius:13px 13px 0 0;padding:14px 16px}
+details.fold.bonus:not([open])>summary{border-radius:13px}
+details.fold.bonus>summary::after{color:#fff;font-size:1.3rem}
+.bsum{display:flex;align-items:center;gap:12px;min-width:0}
+.bstar{width:42px;height:42px;border-radius:50%;background:#ffd54a;color:#7a5200;display:inline-flex;align-items:center;justify-content:center;font-size:1.4rem;flex:none;box-shadow:0 0 0 3px #fff}
+.btxt{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.btxt b{font-family:var(--display);font-weight:900;font-size:1.25rem}
+.btxt small{font-family:var(--body);font-size:.85rem;opacity:.95}
+details.fold.bonus>.in{padding-top:14px}
+.bopts button:active{background:var(--blue-soft);border-color:var(--blue)}
+.quizbtn{background:#ffd54a!important;color:#111!important;border-color:#ffd54a!important;font-weight:700;white-space:nowrap}
+/* narrow phones: keep team names whole in the small balance boxes */
+.mini li b{white-space:nowrap}
+@media (max-width:380px){.mini li{flex-direction:column;align-items:flex-start;gap:0;padding:6px 10px}.mini li span{max-width:100%}}
 
 .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:4}
 .tabs button{border:0;background:transparent;border-radius:9px;padding:8px 2px;font-size:.88rem;font-weight:600;color:var(--muted);min-height:42px}
@@ -318,8 +334,9 @@ function keepUI(app, fn){
 }
 
 const START = 300;
-const VERSION = "2.2";
+const VERSION = "2.3";
 const CHANGES = {
+  "2.3": ["עיצוב: רקע תכלת בהיר ופונט חם יותר לטקסטים.","החידון בולט יותר: כפתור ״★ חידון״ בפס העליון, והוא מופיע ראשון במסך.","בחידון לוחצים על התשובה וזהו, אין יותר כפתור ״שליחה״."],
   "2.2": ["חדש: קבוצה 6 של סבא וסבתא. רואים בזמן אמת את המצב של כל הקבוצות, את הרמזים שאפשר לתת בכל תחנה, ואפשר לענות על החידון בלי ניקוד."],
   "2.1": ["חידון הבונוס: תיקוני תשובות לפי ליאת, ובשאלה האחרונה נוספה התשובה ״כל התשובות נכונות״."],
   "2.0": ["חידון הבונוס גדל: שאלות על כל מה שסבא סיפר, ושאלה אחרונה שבה כל התשובות נכונות.","כל תשובה נכונה שווה עכשיו 5 ₪."],
@@ -391,8 +408,8 @@ function bonusHTML(practice){
   const mine=qid=>practice?ui.cbonus[qid]:b[bKey(t,me,qid)];
   const done=qs.filter(q=>mine(q.id)).length, right=qs.filter(q=>{const a=mine(q.id);return a&&a.ok;}).length;
   const teamEarned=practice?0:Object.values(b).filter(x=>x.team===t&&x.ok).length*BONUS_PTS;
-  let h=`<details class="fold bonus" id="d-bonus"><summary>חידון בונוס · ${BONUS_PTS} ₪ לכל תשובה נכונה</summary><div class="in">
-    <p>כל אחד מחברי הקבוצה עונה מהטלפון שלו, פעם אחת על כל שאלה. כל תשובה נכונה מכניסה ${BONUS_PTS} ₪ לקופה של הקבוצה. אפשר לענות מתי שרוצים, לאורך כל המירוץ.</p>`;
+  let h=`<details class="fold bonus" id="d-bonus"><summary><span class="bsum"><span class="bstar" aria-hidden="true">★</span><span class="btxt"><b>חידון בונוס על סבא</b><small>${BONUS_PTS} ₪ לכל תשובה נכונה · ענית על ${done} מתוך ${qs.length}</small></span></span></summary><div class="in">
+    <p>כל אחד מחברי הקבוצה עונה מהטלפון שלו, פעם אחת על כל שאלה. לוחצים על התשובה וזהו, היא נשלחת. כל תשובה נכונה מכניסה ${BONUS_PTS} ₪ לקופה של הקבוצה. אפשר לענות מתי שרוצים, לאורך כל המירוץ.</p>`;
   if(practice) h+=`<p class="muted small">${L.grand?"כאן עונים בשביל הכיף: התשובות לא נשמרות ולא מוסיפות כסף לאף קבוצה.":"במצב בקרה התשובות לא נשמרות ולא מוסיפות כסף."}</p>`;
   else if(!db) return h+`<p class="warn">החידון עובד כשיש חיבור לנתונים.</p></div></details>`;
   else h+=`<p class="pill-blue" style="align-self:flex-start">הקבוצה הרוויחה מהחידון: ${shekel(teamEarned)}</p>`;
@@ -400,17 +417,16 @@ function bonusHTML(practice){
   h+=`<p class="muted small mono">ענית על ${done} מתוך ${qs.length} · ${right} נכונות</p>`;
   if(ui.berr) h+=`<p class="err" role="alert">${esc(ui.berr)}</p>`;
   const letters=["א","ב","ג","ד","ה"];
-  qs.forEach((q,i)=>{const a=mine(q.id), sel=ui.bsel[q.id];
+  qs.forEach((q,i)=>{const a=mine(q.id);
     h+=`<article class="bq" id="bq-${q.id}"><div class="bqtop"><span class="tag">שאלה ${i+1}</span><span class="muted small">${esc(BONUS_KIND[q.kind]||"")}</span></div><p class="bqt">${esc(q.q)}</p>`;
     if(a) h+=`<p class="bres ${a.ok?"ok":"no"}">ענית: ${esc(q.opts[a.pick])} · ${a.ok?`נכון! +${BONUS_PTS} ₪`:"לא נכון"}</p>${a.ok&&q.all?`<p class="muted small">${esc(q.ex)}</p>`:""}`;
-    else h+=`<div class="bopts">${q.opts.map((o,k)=>`<button type="button" data-bq="${q.id}" data-o="${k}" aria-pressed="${sel===k}"><b>${letters[k]}.</b> ${esc(o)}</button>`).join("")}</div>
-      <button class="btn" data-bsend="${q.id}"${sel===undefined?" disabled":""}>שליחת תשובה</button>`;
+    else h+=`<div class="bopts">${q.opts.map((o,k)=>`<button type="button" data-bq="${q.id}" data-o="${k}"><b>${letters[k]}.</b> ${esc(o)}</button>`).join("")}</div>`;
     h+=`</article>`;});
   return h+`</div></details>`;
 }
 function bindBonus(practice){
-  document.querySelectorAll("[data-bq]").forEach(x=>x.onclick=()=>{ui.bsel[x.dataset.bq]=+x.dataset.o;render();});
-  document.querySelectorAll("[data-bsend]").forEach(x=>x.onclick=()=>{const qid=x.dataset.bsend,k=ui.bsel[qid];if(k===undefined)return;
+  /* Tapping an answer sends it (Liat's choice: no separate send button). */
+  document.querySelectorAll("[data-bq]").forEach(x=>x.onclick=()=>{const qid=x.dataset.bq,k=+x.dataset.o;
     if(practice){const q=DATA.bonus.find(z=>z.id===qid);ui.cbonus[qid]={pick:k,ok:isRight(q,k)};delete ui.bsel[qid];render();toast(isRight(q,k)?"נכון":"לא נכון");}
     else answerBonus(qid,k);});
   const bn=$("#bnot"); if(bn) bn.onclick=()=>{ if(practice) L.ctrlMe=""; else L.me=""; ui.bsel={};ui.berr="";saveL();render();scrollTo(0,0);};
@@ -575,7 +591,7 @@ function teamHTML(){
   const steps=DATA.steps, txs=txAll(), u=unlockedFor(t), next=steps[u+1];
   if(L.preview===null && u>L.seen){ ui.scrollTo="card-"+steps[u].id; toast(`${steps[u].label} נפתחה`); L.seen=u; saveL(); }
   let h=`<header class="bar"><div class="who"><span class="dot" style="background:${TEAM_VAR(t)}"></span><span class="name">${esc(tname(t))}</span>${L.preview===null?`<span class="meName">· ${esc(L.me)}</span>`:""}</div>
-    <div class="mybal"><b>${db||isHost()?shekel(balOf(t,txs)):"—"}</b>${statusHTML()}</div></header>`;
+    <div class="mybal"><b>${db||isHost()?shekel(balOf(t,txs)):"—"}</b>${statusHTML()}</div>${L.preview===null?`<button class="barbtn quizbtn" id="toquiz">★ חידון</button>`:""}</header>`;
   if(L.preview!==null) h+=`<div class="warn">זו תצוגה מקדימה של מסך הקבוצה. <button class="btn alt" id="endprev" style="min-height:36px;padding:4px 12px;margin-inline-start:6px">חזרה למנחים</button></div>`;
   else if(!db) h+=`<div class="warn">כדי לראות את היתרה ואת הכרטיסיות מתעדכנות לבד, פתחו את הקישור כשאתם מחוברים לחשבון claude.ai. בינתיים אפשר לפתוח כרטיסיות עם קוד מהמנחה.</div>`;
   else if((srv.stale||srv.err)&&!srv.live) h+=`<div class="warn">אין חיבור כרגע. מוצג המצב האחרון שהתקבל, והוא יתעדכן כשהקליטה תחזור. אפשר לפתוח כרטיסייה עם קוד מהמנחה.</div>`;
@@ -586,8 +602,8 @@ function teamHTML(){
     const order=[0,1,2,3].map(x=>({x,b:balOf(x,txs)})).sort((a,b)=>b.b-a.b);
     h+=`<ul class="mini" aria-label="היתרות של כל הקבוצות">${order.map(o=>`<li class="${o.x===t?"me":""}" style="--c:${TEAM_VAR(o.x)}"><span>${esc(tname(o.x))}</span><b>${shekel(o.b)}</b></li>`).join("")}</ul>`;
   }
-  h+=briefingHTML(u<0);
   if(L.preview===null) h+=bonusHTML(false);
+  h+=briefingHTML(u<0);
   h+=`<div class="sect"><h2>הכרטיסיות שלכם</h2><span class="muted small mono">${Math.max(0,u+1)}/${steps.length}</span></div>`;
   for(let i=0;i<=u;i++) h+=stepCardHTML(steps[i], tname(t));
   if(next){
@@ -630,6 +646,7 @@ function bindTeam(){
   document.querySelectorAll(".pick button").forEach(b=>b.onclick=()=>{ui.pick=+b.dataset.t;render();});
   const go=$("#go"); if(go) go.onclick=()=>{ if(ui.pick===null) return; L.team=ui.pick; L.codeUnlocked=-1; L.seen=teamsAll()[ui.pick].progress; L.resetSeen=teamsAll()[ui.pick].reset||0; saveL(); render(); scrollTo(0,0); };
   const sw=$("#sw"); if(sw) sw.onclick=()=>{ui.confirmSwitch=true;render();scrollTo({top:0,behavior:"smooth"});};
+  const tq=$("#toquiz"); if(tq) tq.onclick=()=>{const d=$("#d-bonus"); if(d){d.open=true; d.scrollIntoView({behavior:"smooth",block:"start"});}};
   const cn=$("#chname"); if(cn) cn.onclick=()=>{L.me="";ui.bsel={};saveL();render();scrollTo(0,0);};
   if($("#who")){ bindWho(false); }
   const y=$("#swyes"); if(y) y.onclick=()=>{L.team=null;L.me="";L.codeUnlocked=-1;L.seen=-1;ui.pick=null;ui.confirmSwitch=false;saveL();render();};

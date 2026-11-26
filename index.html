@@ -21,7 +21,9 @@
 }
 *{box-sizing:border-box}
 html,body{background:var(--bg);color:var(--ink)}
-body{font-family:var(--body);font-size:17px;line-height:1.6;direction:rtl;
+html{font-size:20px;-webkit-text-size-adjust:100%;text-size-adjust:100%} /* v3.0: bigger text on phones (was the 16px browser default; every size is in rem) */
+@media (max-width:359px){html{font-size:18px}}
+body{font-family:var(--body);font-size:1rem;line-height:1.6;direction:rtl;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bar)}
 .wrap{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
@@ -40,8 +42,8 @@ button{cursor:pointer}
   padding:10px max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;justify-content:space-between;gap:12px}
 .bar .who{display:flex;align-items:center;gap:10px;min-width:0}
 .bar .dot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.7)}
-.bar .name{font-family:var(--display);font-size:1.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.barbtn{background:transparent;border:1px solid rgba(255,255,255,.4);color:var(--bar-ink);border-radius:8px;padding:5px 12px;font-size:.88rem;min-height:36px}
+.bar .name{font-family:var(--display);font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barbtn{background:transparent;border:1px solid rgba(255,255,255,.4);color:var(--bar-ink);border-radius:8px;padding:5px 12px;font-size:.88rem;min-height:36px;white-space:nowrap}
 
 .hero{display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:18px;text-align:center}
 .plate{background:var(--plate);border-radius:16px;padding:10px 14px;display:inline-flex}
@@ -172,6 +174,7 @@ details.fold.bonus>summary{color:var(--blue)}
 .bq .tag,.card>.tag{align-self:flex-start;display:inline-block;background:var(--ink);color:#fff;border-radius:999px;padding:1px 10px;font-size:.8rem;font-weight:700}
 #bform input{letter-spacing:normal;text-align:start;font-family:var(--body);font-size:1rem}
 .bar .meName{font-size:.9rem;opacity:.85;white-space:nowrap}
+@media (max-width:359px){.bar .meName{display:none}}
 .pick.who b{font-family:var(--display);font-size:1.25rem}
 /* group 6: Saba & Savta */
 .gteams{display:grid;gap:10px}
@@ -259,7 +262,7 @@ details.fold.bonus>.in{padding-top:14px}
 .bkey li.right::after{content:" ✓"}
 
 .mybal{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
-.mybal b{font-family:var(--mono);font-size:1.3rem;font-weight:600}
+.mybal b{font-family:var(--mono);font-size:1.1rem;font-weight:600;white-space:nowrap}
 .mini{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mini li{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;border-inline-start:6px solid var(--c);min-width:0}
 .mini li span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -337,8 +340,9 @@ function keepUI(app, fn){
 }
 
 const START = 300;
-const VERSION = "2.9";
+const VERSION = "3.0";
 const CHANGES = {
+  "3.0": ["תיקון: קבוצה נשארת סגורה עד שהמנחים פותחים אותה. עד אז המשתתפים רואים רק ״המירוץ עוד לא התחיל״, בלי תדריך, חידון או כרטיסיות.", "בלשונית ״פתיחה״ אצל המנחים: ״פתיחת כל הקבוצות״, ופתיחה או סגירה של כל קבוצה בנפרד. פתיחת כרטיסייה לקבוצה פותחת גם את הקבוצה."],
   "2.9": ["חזרה למראה של גרסה 2.6: הרקע עם הקונפטי בלבד, בלי לוגו ברקע."],
   "2.8": ["בוטל שינוי הרקע של גרסה 2.7. ברקע מופיע עכשיו רק לוגו המירוץ, כמו בראש המסך, והכרטיסיות חזרו להיות לבנות."],
   "2.7": ["הלוגו של המירוץ הוטמע ברקע, בעדינות, מאחורי כל המסכים."],
@@ -401,7 +405,7 @@ function bonusAll(){
 function bonusPeople(t, b=bonusAll()){ return [...new Set(Object.values(b).filter(x=>x.team===t).map(x=>normName(x.who)))]; }
 function answerBonus(qid,k){
   const t=L.team, name=normName(L.me), q=DATA.bonus.find(x=>x.id===qid);
-  if(t===null||!name||!q) return;
+  if(t===null||!name||!q||!teamsAll()[t].open) return;
   if(bankLocked()){ toast("צפייה בלבד: אין לחשבון הזה הרשאת עריכה"); return; }
   const b=bonusAll(), id=bKey(t,name,qid);
   if(b[id]){ toast("כבר ענית על השאלה הזאת"); return; }
@@ -475,7 +479,7 @@ function delTx(id){
 function setTeam(t, patch){
   const data=Object.assign({}, teamsAll()[t], patch);
   L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));
-  enqueue({op:"team", t, data:{name:data.name, progress:data.progress, reset:data.reset||0}});
+  enqueue({op:"team", t, data:{name:data.name, progress:data.progress, reset:data.reset||0, open:!!data.open}});
 }
 async function flush(){
   if(!db||flushing||writeDenied) return;
@@ -596,6 +600,8 @@ function unlockedFor(t){ return Math.max(teamsAll()[t].progress, L.preview!==nul
 function teamHTML(){
   const t=myTeam();
   if(t===null) return pickHTML();
+  /* v3.0 gate: a team sees nothing (briefing, quiz, cards, codes) until the hosts open it. */
+  if(L.preview===null && !teamsAll()[t].open) return gateHTML(t);
   if(L.preview===null && !DATA.members[t].includes(L.me)) return whoHTML(t,false);
   const steps=DATA.steps, txs=txAll(), u=unlockedFor(t), next=steps[u+1];
   if(L.preview===null && u>L.seen){ ui.scrollTo="card-"+steps[u].id; toast(`${steps[u].label} נפתחה`); L.seen=u; saveL(); }
@@ -627,6 +633,13 @@ function teamHTML(){
   if(L.preview===null) h+=`<div class="row"><button class="btn ghost" id="sw">החלפת קבוצה</button><button class="btn ghost" id="chname">החלפת שם</button><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>`+hostWinHTML();
   return h;
 }
+function gateHTML(t){
+  return `<header class="bar"><div class="who"><span class="dot" style="background:${TEAM_VAR(t)}"></span><span class="name">${esc(tname(t))}</span></div><div class="mybal">${statusHTML()}</div></header>
+    ${heroHTML("המירוץ של סבא דוד","✦ מירוץ משפחתי לכבוד יום הולדת 80 ✦")}
+    <div class="card" id="gate"><h2>המירוץ עוד לא התחיל</h2><p>${esc(tname(t))} עדיין סגורה. המנחים יפתחו את הקבוצה כשהמירוץ יתחיל, והמסך ייפתח כאן לבד. אין צורך לרענן.</p>
+    ${!db?`<p class="muted small">כדי שהמסך ייפתח לבד, פתחו את הקישור כשאתם מחוברים לחשבון claude.ai.</p>`:(srv.stale||srv.err)&&!srv.live?`<p class="muted small">אין חיבור כרגע. המסך ייפתח כשהקליטה תחזור.</p>`:""}</div>
+    <div class="row"><button class="btn ghost" id="gsw">החלפת קבוצה</button><button class="btn ghost" id="ctrlin">קבוצת בקרה</button><button class="btn ghost" id="hostin">כניסת מנחים</button></div>${hostWinHTML()}`;
+}
 function pickHTML(){
   return `${heroHTML("המירוץ של סבא דוד","✦ מירוץ משפחתי לכבוד יום הולדת 80 ✦")}
     <div class="card"><h2>באיזו קבוצה אתם?</h2>
@@ -656,6 +669,7 @@ function bindTeam(){
     /* Group 5 (Saba & Savta) shows the hints, so it opens only with the hosts' code. */
     if(ui.pick===4){ ui.hostWin="grand"; ui.hostErr=""; render(); const w=$("#hostwin"); if(w){ w.scrollIntoView({behavior:"smooth",block:"center"}); $("#hcode").focus({preventScroll:true}); } return; }
     L.team=ui.pick; L.codeUnlocked=-1; L.seen=teamsAll()[ui.pick].progress; L.resetSeen=teamsAll()[ui.pick].reset||0; saveL(); render(); scrollTo(0,0); };
+  const gs=$("#gsw"); if(gs) gs.onclick=()=>{L.team=null;L.me="";L.codeUnlocked=-1;L.seen=-1;ui.pick=null;saveL();render();scrollTo(0,0);};
   const sw=$("#sw"); if(sw) sw.onclick=()=>{ui.confirmSwitch=true;render();scrollTo({top:0,behavior:"smooth"});};
   const tq=$("#toquiz"); if(tq) tq.onclick=()=>{const d=$("#d-bonus"); if(d){d.open=true; d.scrollIntoView({behavior:"smooth",block:"start"});}};
   const cn=$("#chname"); if(cn) cn.onclick=()=>{L.me="";ui.bsel={};saveL();render();scrollTo(0,0);};
@@ -842,10 +856,15 @@ function guideHTML(){
 }
 function codesHTML(){
   const steps=DATA.steps, tm=teamsAll();
-  let h=`<p class="muted">״פתיחה לקבוצה״ מציג את הכרטיסייה הבאה בטלפון של הקבוצה. אם אין שם קליטה, תנו לקבוצה את הקוד.</p>`;
+  const closed=[0,1,2,3].filter(t=>!tm[t].open);
+  let h=`<div class="card gatecard"><h2>כניסת הקבוצות</h2><p class="muted small">עד שקבוצה נפתחת, המשתתפים רואים רק ״המירוץ עוד לא התחיל״: בלי תדריך, בלי חידון ובלי כרטיסיות.</p>
+    <p><b>${closed.length?`סגורות: ${closed.map(t=>esc(tname(t))).join(", ")}`:"כל הקבוצות פתוחות"}</b></p>
+    ${closed.length?`<button class="btn good" id="openall">פתיחת כל הקבוצות</button>`:""}</div>`;
+  h+=`<p class="muted">״פתיחה לקבוצה״ מציג את הכרטיסייה הבאה בטלפון של הקבוצה, ופותח גם את הקבוצה אם היא עדיין סגורה. אם אין שם קליטה, תנו לקבוצה את הקוד.</p>`;
   h+=[0,1,2,3].map(t=>{
-    const p=tm[t].progress, next=steps[p+1];
-    return `<div class="card codecard" style="--c:${TEAM_VAR(t)}"><div class="meta"><b>${esc(tname(t))}</b><span class="muted">${p<0?"עוד לא נפתחה אף כרטיסייה":"פתוח עד: "+esc(steps[p].label)}</span></div>
+    const p=tm[t].progress, next=steps[p+1], op=!!tm[t].open;
+    return `<div class="card codecard" style="--c:${TEAM_VAR(t)}"><div class="meta"><b>${esc(tname(t))}</b><span class="muted">${op?"הקבוצה פתוחה":"הקבוצה סגורה"} · ${p<0?"עוד לא נפתחה אף כרטיסייה":"פתוח עד: "+esc(steps[p].label)}</span></div>
+      <button class="btn ${op?"ghost":"alt"}" data-open="${t}" data-v="${op?0:1}">${op?"סגירת הקבוצה":"פתיחת הקבוצה בלי כרטיסייה"}</button>
       ${next?`<button class="btn good" data-give="${t}">פתיחה לקבוצה: ${esc(next.label)}</button>
         <div class="muted small" style="text-align:center">קוד ל־${esc(next.label)}, אם אין קליטה</div><div class="big">${DATA.codes[t][p+1]}</div>
         ${p>=0?`<button class="btn ghost" data-back="${t}">ביטול הפתיחה האחרונה</button>`:""}`
@@ -868,7 +887,7 @@ function setHTML(){
   <div class="card"><h2>קבוצת בקרה</h2><p class="muted">מעבר על כל הכרטיסיות, התמונות והעיצובים כמו שהקבוצות רואות, בלי לשנות כלום במירוץ.</p><button class="btn" id="toctrl">פתיחת קבוצת הבקרה</button></div>
   <div class="card"><h2>קבוצה 5 · סבא וסבתא</h2><p class="muted">המצב של כל הקבוצות בזמן אמת, הרמזים שאפשר לתת בכל תחנה, וחידון בלי ניקוד. לא משנה כלום במירוץ.</p><button class="btn" id="togrand">פתיחת המסך של סבא וסבתא</button></div>
   <div class="card"><h2>מה הקבוצות רואות</h2><p class="muted">תצוגה מקדימה של מסך הקבוצה, בלי לשנות כלום.</p><div class="row">${[0,1,2,3].map(t=>`<button class="btn alt" data-prev="${t}">${esc(tname(t))}</button>`).join("")}</div></div>
-  <div class="card"><h2>איפוס המירוץ</h2><p class="muted">מוחק את כל הרישומים ומחזיר את כל הכרטיסיות למצב נעול, אצל כולם. שמות הקבוצות נשמרים.</p>
+  <div class="card"><h2>איפוס המירוץ</h2><p class="muted">מוחק את כל הרישומים, סוגר את כל הקבוצות ומחזיר את כל הכרטיסיות למצב נעול, אצל כולם. שמות הקבוצות נשמרים.</p>
    ${ui.confirmReset?`<div class="row"><button class="btn bad" id="resetyes">כן, למחוק הכול</button><button class="btn alt" id="resetno">ביטול</button></div>`:`<button class="btn ghost" id="reset">איפוס</button>`}</div>`;
 }
 function bindHost(){
@@ -887,7 +906,9 @@ function bindHost(){
     if(ui.armed===id){ui.armed=null;clearTimeout(ui.armedTimer);delTx(id);return;}
     ui.armed=id;clearTimeout(ui.armedTimer);ui.armedTimer=setTimeout(()=>{ui.armed=null;render();},4000);render();});
   const la=$("#logall"); if(la) la.onclick=()=>{ui.logAll=!ui.logAll;render();};
-  all("[data-give]",b=>b.onclick=()=>{const t=+b.dataset.give,p=teamsAll()[t].progress;if(p<DATA.steps.length-1){setTeam(t,{progress:p+1});toast(`${tname(t)}: ${DATA.steps[p+1].label} נפתחה`);}});
+  all("[data-give]",b=>b.onclick=()=>{const t=+b.dataset.give,p=teamsAll()[t].progress;if(p<DATA.steps.length-1){setTeam(t,{progress:p+1,open:true});toast(`${tname(t)}: ${DATA.steps[p+1].label} נפתחה`);}});
+  all("[data-open]",b=>b.onclick=()=>{const t=+b.dataset.open,v=b.dataset.v==="1";setTeam(t,{open:v});toast(`${tname(t)}: ${v?"הקבוצה נפתחה":"הקבוצה נסגרה"}`);});
+  const oa=$("#openall"); if(oa) oa.onclick=()=>{[0,1,2,3].forEach(t=>{if(!teamsAll()[t].open) setTeam(t,{open:true});});toast("כל הקבוצות נפתחו");};
   all("[data-back]",b=>b.onclick=()=>{const t=+b.dataset.back,p=teamsAll()[t].progress;if(p>=0) setTeam(t,{progress:p-1});});
   all("[data-name]",inp=>inp.onchange=()=>{const t=+inp.dataset.name;const v=inp.value.trim()||`קבוצה ${t+1}`;if(v!==tname(t)) setTeam(t,{name:v});});
   const tg=$("#togrand"); if(tg) tg.onclick=()=>{L.grand=true;L.grandMe="";L.grandSt=L.grandSt||1;saveL();render();scrollTo(0,0);};
@@ -902,7 +923,7 @@ function bindHost(){
     ids.filter(id=>srv.tx[id]).forEach(id=>L.outbox.push({op:"del",id}));
     L.outbox=L.outbox.filter(o=>o.op!=="bset");
     Object.keys(srv.bonus).forEach(id=>L.outbox.push({op:"bdel",id}));
-    [0,1,2,3].forEach(t=>{L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));L.outbox.push({op:"team",t,data:{name:tname(t),progress:-1,reset:Date.now()}});});
+    [0,1,2,3].forEach(t=>{L.outbox=L.outbox.filter(o=>!(o.op==="team"&&o.t===t));L.outbox.push({op:"team",t,data:{name:tname(t),progress:-1,reset:Date.now(),open:false}});});
     L.codeUnlocked=-1; L.seen=-1; saveL(); render(); flush(); toast("המירוץ אופס");
   };
 }
